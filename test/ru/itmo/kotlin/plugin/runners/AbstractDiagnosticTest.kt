@@ -1,0 +1,18 @@
+package ru.itmo.kotlin.plugin.runners
+
+import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
+import org.jetbrains.kotlin.test.directives.ConfigurationDirectives.WITH_STDLIB
+import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives.FIR_DUMP
+import org.jetbrains.kotlin.test.runners.baseFirDiagnosticTestConfiguration
+import org.jetbrains.kotlin.test.services.EnvironmentBasedStandardLibrariesPathProvider
+import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
+
+abstract class AbstractDiagnosticTest : BaseTestRunner() {
+    override fun TestConfigurationBuilder.configuration() {
+        commonFirWithPluginFrontendConfiguration()
+    }
+
+    override fun createKotlinStandardLibrariesPathProvider(): KotlinStandardLibrariesPathProvider {
+        return EnvironmentBasedStandardLibrariesPathProvider
+    }
+}
