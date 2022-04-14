@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version "1.7.20-dev-52"
+    kotlin("jvm") version "1.7.20-dev-205"
 }
 group = "ru.itmo.kotlin.plugin"
 version = "0.1"
