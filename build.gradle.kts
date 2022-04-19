@@ -74,7 +74,7 @@ fun Test.setLibraryProperty(propName: String, jarName: String) {
     val path = project.configurations
         .testRuntimeClasspath.get()
         .files
-        .find { """$jarName-.*jar""".toRegex().matches(it.name) }
+        .find { """$jarName-\d.*jar""".toRegex().matches(it.name) }
         ?.absolutePath
         ?: return
     systemProperty(propName, path)
