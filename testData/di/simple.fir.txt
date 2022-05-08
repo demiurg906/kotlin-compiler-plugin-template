@@ -1,0 +1,33 @@
+FILE: simple.kt
+    package foo.bar
+
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(x)) public final class InjectedImpl : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectedImpl| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val inner: R|kotlin/Int| = Int(3)
+            public get(): R|kotlin/Int|
+
+    }
+    @R|org/itmo/my/pretty/plugin/Injectable|() public final class InjectableImpl : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectableImpl| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val x: R|foo/bar/InjectedImpl|
+            public get(): R|foo/bar/InjectedImpl|
+
+    }
+    public final fun box(): R|kotlin/String| {
+        lval impl: R|foo/bar/InjectableImpl| = R|foo/bar/InjectableImpl.InjectableImpl|()
+        ^box when () {
+            ==(R|<local>/impl|.R|foo/bar/InjectableImpl.x|.R|foo/bar/InjectedImpl.inner|, Int(3)) ->  {
+                String(OK)
+            }
+            else ->  {
+                <strcat>(String(Fail: ), R|<local>/impl|)
+            }
+        }
+
+    }

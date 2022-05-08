@@ -11,11 +11,16 @@ import org.jetbrains.kotlin.fir.declarations.FirPluginKey
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.*
 import org.jetbrains.kotlin.ir.expressions.IrBody
+import org.jetbrains.kotlin.ir.expressions.IrFieldAccessExpression
+import org.jetbrains.kotlin.ir.expressions.IrMemberAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.getClass
+import org.jetbrains.kotlin.ir.util.isPropertyAccessor
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -25,8 +30,6 @@ abstract class AbstractTransformerForGenerator(protected val context: IrPluginCo
     protected val irBuiltIns = context.irBuiltIns
 
     abstract fun interestedIn(key: FirPluginKey): Boolean
-    abstract fun generateBodyForFunction(function: IrSimpleFunction, key: FirPluginKey): IrBody?
-    abstract fun generateBodyForConstructor(constructor: IrConstructor, key: FirPluginKey): IrBody?
 
     final override fun visitElement(element: IrElement) {
         when (element) {
@@ -37,59 +40,58 @@ abstract class AbstractTransformerForGenerator(protected val context: IrPluginCo
         }
     }
 
-    final override fun visitSimpleFunction(declaration: IrSimpleFunction) {
-        val origin = declaration.origin
-        if (origin !is IrPluginDeclarationOrigin || !interestedIn(origin.pluginKey)) return
-        require(declaration.body == null)
-        declaration.body = generateBodyForFunction(declaration, origin.pluginKey)
+    override fun visitMemberAccess(expression: IrMemberAccessExpression<*>, data: Nothing?) {
+        TODO("fff")
     }
 
-    final override fun visitConstructor(declaration: IrConstructor) {
-        val origin = declaration.origin
-        if (origin !is IrPluginDeclarationOrigin || !interestedIn(origin.pluginKey)) return
-        require(declaration.body == null)
-        declaration.body = generateBodyForConstructor(declaration, origin.pluginKey)
+    override fun visitFieldAccess(expression: IrFieldAccessExpression) {
+        TODO("vvv")
     }
 
-    // ------------------------ utilities ------------------------
-
-    protected fun generateDefaultBodyForMaterializeFunction(function: IrSimpleFunction): IrBody? {
-        val constructedType = function.returnType as? IrSimpleType ?: return null
-        val constructedClassSymbol = constructedType.classifier
-        val constructedClass = constructedClassSymbol.owner as? IrClass ?: return null
-        val constructor = constructedClass.primaryConstructor ?: return null
+    final override fun visitProperty(declaration: IrProperty) {
+        val origin = declaration.origin
+        if (origin !is IrPluginDeclarationOrigin || !interestedIn(origin.pluginKey)) return
+        val getter = declaration.getter
+        require(getter != null)
+        println(">>>>>>>")
+        val delegatingAnyCall = IrDelegatingConstructorCallImpl(
+            -1,
+            -1,
+            irBuiltIns.anyType,
+            irBuiltIns.anyClass.owner.primaryConstructor?.symbol ?: return,
+            typeArgumentsCount = 0,
+            valueArgumentsCount = 0
+        )
+        val constructor = getter.returnType.getClass()?.primaryConstructor ?: throw Exception("Wrong DI variable type")
         val constructorCall = IrConstructorCallImpl(
             -1,
             -1,
-            constructedType,
+            getter.returnType,
             constructor.symbol,
             typeArgumentsCount = 0,
             constructorTypeArgumentsCount = 0,
             valueArgumentsCount = 0
         )
-        val returnStatement = IrReturnImpl(-1, -1, irBuiltIns.nothingType, function.symbol, constructorCall)
-        return irFactory.createBlockBody(-1, -1, listOf(returnStatement))
+        val returnStatement = IrReturnImpl(-1, -1, getter.returnType, getter.symbol, constructorCall)
+        getter.body = irFactory.createBlockBody(-1, -1, listOf(returnStatement))
     }
 
-    protected fun generateBodyForDefaultConstructor(declaration: IrConstructor): IrBody? {
-        val type = declaration.returnType as? IrSimpleType ?: return null
-
-        val delegatingAnyCall = IrDelegatingConstructorCallImpl(
-            -1,
-            -1,
-            irBuiltIns.anyType,
-            irBuiltIns.anyClass.owner.primaryConstructor?.symbol ?: return null,
-            typeArgumentsCount = 0,
-            valueArgumentsCount = 0
-        )
-
-        val initializerCall = IrInstanceInitializerCallImpl(
-            -1,
-            -1,
-            (declaration.parent as? IrClass)?.symbol ?: return null,
-            type
-        )
-
-        return irFactory.createBlockBody(-1, -1, listOf(delegatingAnyCall, initializerCall))
-    }
+//    final override fun visitVariable(declaration: IrVariable) {
+//        super.visitVariable(declaration)
+//        val origin = declaration.origin
+//        println("xxxx")
+//        if (origin !is IrPluginDeclarationOrigin || !interestedIn(origin.pluginKey)) return
+//        require(declaration.initializer == null)
+////        val constructor = declaration.type.getClass()?.primaryConstructor ?: throw Exception("Wrong DI variable type")
+////        val constructorCall = IrConstructorCallImpl(
+////            -1,
+////            -1,
+////            declaration.type,
+////            constructor.symbol,
+////            typeArgumentsCount = 0,
+////            constructorTypeArgumentsCount = 0,
+////            valueArgumentsCount = 0
+////        )
+//        declaration.initializer = TODO("xxx")
+//    }
 }
