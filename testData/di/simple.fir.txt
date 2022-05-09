@@ -1,9 +1,16 @@
 FILE: simple.kt
     package foo.bar
 
+    public final var ext: R|kotlin/Int| = Int(0)
+        public get(): R|kotlin/Int|
+        public set(value: R|kotlin/Int|): R|kotlin/Unit|
     @R|org/itmo/my/pretty/plugin/Injected|(name = String(x)) public final class InjectedImpl : R|kotlin/Any| {
         public constructor(): R|foo/bar/InjectedImpl| {
             super<R|kotlin/Any|>()
+        }
+
+        init {
+            R|foo/bar/ext| = R|foo/bar/ext|.R|kotlin/Int.plus|(Int(1))
         }
 
         public final val inner: R|kotlin/Int| = Int(3)
@@ -16,17 +23,41 @@ FILE: simple.kt
         }
 
         public final val x: R|foo/bar/InjectedImpl|
+            public <explicit backing field>: R|foo/bar/InjectedImpl|
+            public get(): R|foo/bar/InjectedImpl|
+
+    }
+    @R|org/itmo/my/pretty/plugin/Injectable|() public final class InjectableImpl2 : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectableImpl2| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val x: R|foo/bar/InjectedImpl|
+            public <explicit backing field>: R|foo/bar/InjectedImpl|
             public get(): R|foo/bar/InjectedImpl|
 
     }
     public final fun box(): R|kotlin/String| {
         lval impl: R|foo/bar/InjectableImpl| = R|foo/bar/InjectableImpl.InjectableImpl|()
+        when () {
+            !=(R|<local>/impl|.R|foo/bar/InjectableImpl.x|.R|foo/bar/InjectedImpl.inner|, Int(3)) || !=(R|<local>/impl|.R|foo/bar/InjectableImpl.x|.R|foo/bar/InjectedImpl.inner|, Int(3)) ->  {
+                ^box <strcat>(String(Fail with wrong initializer: ), R|<local>/impl|)
+            }
+        }
+
+        when () {
+            !=(R|foo/bar/ext|, Int(1)) ->  {
+                ^box <strcat>(String(Initialized ), R|foo/bar/ext|, String( times instead: ), R|<local>/impl|)
+            }
+        }
+
+        lval impl2: R|foo/bar/InjectableImpl2| = R|foo/bar/InjectableImpl2.InjectableImpl2|()
         ^box when () {
-            ==(R|<local>/impl|.R|foo/bar/InjectableImpl.x|.R|foo/bar/InjectedImpl.inner|, Int(3)) ->  {
+            ==(R|<local>/impl2|.R|foo/bar/InjectableImpl2.x|.R|foo/bar/InjectedImpl.inner|, Int(3)) && ==(R|foo/bar/ext|, Int(1)) ->  {
                 String(OK)
             }
             else ->  {
-                <strcat>(String(Fail: ), R|<local>/impl|)
+                <strcat>(String(Fail: initiialized ), R|foo/bar/ext|, String( times ), R|<local>/impl2|)
             }
         }
 
