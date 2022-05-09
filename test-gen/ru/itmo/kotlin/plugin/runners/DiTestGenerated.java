@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 @SuppressWarnings("all")
 @TestMetadata("testData/di")
 @TestDataPath("$PROJECT_ROOT")
-public class DiTestGenerated extends AbstractDiTest {
+public class DITestGenerated extends AbstractDITest {
     @Test
     public void testAllFilesPresentInDi() throws Exception {
         KtTestUtil.assertAllTestsPresentByMetadataWithExcluded(this.getClass(), new File("testData/di"), Pattern.compile("^(.+)\\.kt$"), null, TargetBackend.JVM_IR, true);

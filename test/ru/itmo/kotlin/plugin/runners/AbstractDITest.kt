@@ -15,7 +15,7 @@ import org.jetbrains.kotlin.test.directives.CodegenTestDirectives.DUMP_IR
 import org.jetbrains.kotlin.test.model.DependencyKind
 import org.jetbrains.kotlin.test.runners.RunnerWithTargetBackendForTestGeneratorMarker
 
-open class AbstractDiTest : BaseTestRunner(), RunnerWithTargetBackendForTestGeneratorMarker {
+open class AbstractDITest : BaseTestRunner(), RunnerWithTargetBackendForTestGeneratorMarker {
     override val targetBackend: TargetBackend
         get() = TargetBackend.JVM_IR
 

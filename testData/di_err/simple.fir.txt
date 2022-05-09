@@ -1,0 +1,15 @@
+FILE: simple.kt
+    package foo.bar
+
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(x)) public final class InjectedImpl : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectedImpl| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(x)) public final class InjectedImpl2 : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectedImpl2| {
+            super<R|kotlin/Any|>()
+        }
+
+    }

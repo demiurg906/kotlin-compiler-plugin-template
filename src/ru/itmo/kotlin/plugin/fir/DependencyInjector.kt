@@ -1,31 +1,24 @@
 package ru.itmo.kotlin.plugin.fir
 
+import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
-import org.jetbrains.kotlin.fir.FirFunctionTarget
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.containingClassForStaticMemberAttr
 import org.jetbrains.kotlin.fir.declarations.FirPluginKey
-import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.builder.buildBackingField
 import org.jetbrains.kotlin.fir.declarations.builder.buildProperty
-import org.jetbrains.kotlin.fir.declarations.builder.buildPropertyAccessor
 import org.jetbrains.kotlin.fir.declarations.findArgumentByName
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.expressions.FirConstExpression
-import org.jetbrains.kotlin.fir.expressions.builder.buildBlock
-import org.jetbrains.kotlin.fir.expressions.builder.buildFunctionCall
-import org.jetbrains.kotlin.fir.expressions.builder.buildPropertyAccessExpression
-import org.jetbrains.kotlin.fir.expressions.builder.buildReturnExpression
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicate.DeclarationPredicate
 import org.jetbrains.kotlin.fir.extensions.predicate.has
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
 import org.jetbrains.kotlin.fir.moduleData
-import org.jetbrains.kotlin.fir.references.builder.buildBackingFieldReference
-import org.jetbrains.kotlin.fir.references.builder.buildResolvedCallableReference
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.symbols.FirBasedSymbol
 import org.jetbrains.kotlin.fir.symbols.impl.*
@@ -37,6 +30,7 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.realElement
 
 class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtension(session) {
     companion object {
@@ -52,10 +46,10 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
     private val matchedInjectable by lazy { predicateBasedProvider.getSymbolsByPredicate(INJECTABLE_PREDICATE).filterIsInstance<FirRegularClassSymbol>() }
 
     private val FirBasedSymbol<*>.nameArg: String
-        get() = run {
+        get() {
             val annotation = annotations.find { it.fqName(session) == injectedFQ } ?: throw IllegalArgumentException("No annotation with name $injectedFQ")
             val arg = annotation.findArgumentByName(Name.identifier("name"))
-            ((arg as? FirConstExpression<*>)?.value as? String) ?: throw IllegalArgumentException("No name attribute in annotation $injectedFQ")
+            return ((arg as? FirConstExpression<*>)?.value as? String) ?: throw IllegalArgumentException("No name attribute in annotation $injectedFQ")
         }
 
     override fun generateProperties(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirPropertySymbol> {
@@ -65,9 +59,7 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
             val returnType = buildResolvedTypeRef { type = it.classId.toConeType() }
             val bName = Name.identifier("$${callableId.callableName.asString()}")
             val pStatus = FirResolvedDeclarationStatusImpl(
-                Visibilities.Public,
-                Modality.FINAL,
-                EffectiveVisibility.Public
+                Visibilities.Public, Modality.FINAL, EffectiveVisibility.Public
             )
             val backingField = buildBackingField {
                 moduleData = session.moduleData
@@ -81,16 +73,15 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
                 returnTypeRef = returnType
             }
             buildProperty {
-                getter = buildPropertyAccessor {
-                    resolvePhase = FirResolvePhase.BODY_RESOLVE
-                    moduleData = session.moduleData
-                    origin = Key.origin
-                    status = pStatus
-                    propertySymbol = psymbol
-                    isGetter = true
-                    symbol = FirPropertyAccessorSymbol()
-                    returnTypeRef = returnType
-                }
+                getter = FirDefaultPropertyGetter(
+                    source = owner.source,
+                    moduleData = session.moduleData,
+                    origin = Key.origin,
+                    propertyTypeRef = returnType,
+                    visibility = Visibilities.Public,
+                    propertySymbol = psymbol,
+                    effectiveVisibility = EffectiveVisibility.Public
+                )
                 this.backingField = backingField
 
                 moduleData = session.moduleData
@@ -124,7 +115,8 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
     }
 
     object Key : FirPluginKey() {
-        override fun toString(): String { return "DependencyInjector"
+        override fun toString(): String {
+            return "DependencyInjector"
         }
     }
 }

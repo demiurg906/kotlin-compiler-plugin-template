@@ -1,6 +1,21 @@
 FILE: simple.kt
     package foo.bar
 
+    public final annotation class OtherAnnotation : R|kotlin/Annotation| {
+        public constructor(name: R|kotlin/String|): R|foo/bar/OtherAnnotation| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val name: R|kotlin/String| = R|<local>/name|
+            public get(): R|kotlin/String|
+
+    }
+    @R|foo/bar/OtherAnnotation|(name = String(x)) public final class ClassWithoutErrors : R|kotlin/Any| {
+        public constructor(): R|foo/bar/ClassWithoutErrors| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
     public final var ext: R|kotlin/Int| = Int(0)
         public get(): R|kotlin/Int|
         public set(value: R|kotlin/Int|): R|kotlin/Unit|
