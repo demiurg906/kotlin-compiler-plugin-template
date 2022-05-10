@@ -1,3 +1,3 @@
 package org.itmo.my.pretty.plugin
 
-annotation class SomeAnnotation
+annotation class Immutable

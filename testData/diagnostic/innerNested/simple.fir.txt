@@ -1,0 +1,101 @@
+FILE: simple.kt
+    package foo.bar
+
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class ImmutableOuter : R|kotlin/Any| {
+        public constructor(): R|foo/bar/ImmutableOuter| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|org/itmo/my/pretty/plugin/Immutable|() public final class ImmutableNested : R|kotlin/Any| {
+            public constructor(): R|foo/bar/ImmutableOuter.ImmutableNested| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        public final class MutableNested : R|kotlin/Any| {
+            public constructor(): R|foo/bar/ImmutableOuter.MutableNested| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        @R|org/itmo/my/pretty/plugin/Immutable|() public final inner class ImmutableInner : R|kotlin/Any| {
+            public foo/bar/ImmutableOuter.constructor(): R|foo/bar/ImmutableOuter.ImmutableInner| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        public final inner class MutableInner : R|kotlin/Any| {
+            public foo/bar/ImmutableOuter.constructor(): R|foo/bar/ImmutableOuter.MutableInner| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+    }
+    public final class MutableOuter : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MutableOuter| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|org/itmo/my/pretty/plugin/Immutable|() public final class ImmutableNested : R|kotlin/Any| {
+            public constructor(): R|foo/bar/MutableOuter.ImmutableNested| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        public final class MutableNested : R|kotlin/Any| {
+            public constructor(): R|foo/bar/MutableOuter.MutableNested| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        @R|org/itmo/my/pretty/plugin/Immutable|() public final inner class ImmutableInner : R|kotlin/Any| {
+            public foo/bar/MutableOuter.constructor(): R|foo/bar/MutableOuter.ImmutableInner| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+        public final inner class MutableInner : R|kotlin/Any| {
+            public foo/bar/MutableOuter.constructor(): R|foo/bar/MutableOuter.MutableInner| {
+                super<R|kotlin/Any|>()
+            }
+
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class MyImmutable : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MyImmutable| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val a: R|foo/bar/ImmutableOuter.ImmutableNested| = Q|foo/bar/ImmutableOuter|.R|foo/bar/ImmutableOuter.ImmutableNested.ImmutableNested|()
+            public get(): R|foo/bar/ImmutableOuter.ImmutableNested|
+
+        public final val b: R|foo/bar/ImmutableOuter.MutableNested| = Q|foo/bar/ImmutableOuter|.R|foo/bar/ImmutableOuter.MutableNested.MutableNested|()
+            public get(): R|foo/bar/ImmutableOuter.MutableNested|
+
+        public final val c: R|foo/bar/ImmutableOuter.ImmutableInner| = R|foo/bar/ImmutableOuter.ImmutableOuter|().R|foo/bar/ImmutableOuter.ImmutableInner.ImmutableInner|()
+            public get(): R|foo/bar/ImmutableOuter.ImmutableInner|
+
+        public final val d: R|foo/bar/ImmutableOuter.MutableInner| = R|foo/bar/ImmutableOuter.ImmutableOuter|().R|foo/bar/ImmutableOuter.MutableInner.MutableInner|()
+            public get(): R|foo/bar/ImmutableOuter.MutableInner|
+
+        public final val e: R|foo/bar/MutableOuter.ImmutableNested| = Q|foo/bar/MutableOuter|.R|foo/bar/MutableOuter.ImmutableNested.ImmutableNested|()
+            public get(): R|foo/bar/MutableOuter.ImmutableNested|
+
+        public final val f: R|foo/bar/MutableOuter.MutableNested| = Q|foo/bar/MutableOuter|.R|foo/bar/MutableOuter.MutableNested.MutableNested|()
+            public get(): R|foo/bar/MutableOuter.MutableNested|
+
+        public final val g: R|foo/bar/MutableOuter.ImmutableInner| = R|foo/bar/MutableOuter.MutableOuter|().R|foo/bar/MutableOuter.ImmutableInner.ImmutableInner|()
+            public get(): R|foo/bar/MutableOuter.ImmutableInner|
+
+        public final val h: R|foo/bar/MutableOuter.MutableInner| = R|foo/bar/MutableOuter.MutableOuter|().R|foo/bar/MutableOuter.MutableInner.MutableInner|()
+            public get(): R|foo/bar/MutableOuter.MutableInner|
+
+    }

@@ -1,0 +1,39 @@
+FILE: simple.kt
+    package foo.bar
+
+    @R|org/itmo/my/pretty/plugin/Immutable|() public open class ImmutableBase : R|kotlin/Any| {
+        public constructor(): R|foo/bar/ImmutableBase| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public open class MutableBase : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MutableBase| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class ImmutableImmutable : R|foo/bar/ImmutableBase| {
+        public constructor(): R|foo/bar/ImmutableImmutable| {
+            super<R|foo/bar/ImmutableBase|>()
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class MutableImmutable : R|foo/bar/MutableBase| {
+        public constructor(): R|foo/bar/MutableImmutable| {
+            super<R|foo/bar/MutableBase|>()
+        }
+
+    }
+    public final class ImmutableMutable : R|foo/bar/ImmutableBase| {
+        public constructor(): R|foo/bar/ImmutableMutable| {
+            super<R|foo/bar/ImmutableBase|>()
+        }
+
+    }
+    public final class MutableMutable : R|foo/bar/MutableBase| {
+        public constructor(): R|foo/bar/MutableMutable| {
+            super<R|foo/bar/MutableBase|>()
+        }
+
+    }

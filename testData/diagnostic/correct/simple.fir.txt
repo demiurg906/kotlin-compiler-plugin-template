@@ -1,0 +1,65 @@
+FILE: simple.kt
+    package foo.bar
+
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class ImmutableBase : R|kotlin/Any| {
+        public constructor(): R|foo/bar/ImmutableBase| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Immutable|() public final class MyImmutable : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MyImmutable| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val a: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+
+        public final val b: R|foo/bar/ImmutableBase| = R|foo/bar/ImmutableBase.ImmutableBase|()
+            public get(): R|foo/bar/ImmutableBase|
+
+        public final val c: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ Int(32)
+            }
+
+        public final var d: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ Int(32)
+            }
+            public set(value: R|kotlin/Int|): R|kotlin/Unit| {
+            }
+
+    }
+    public final class MyMutable : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MyMutable| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val a: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+
+        public final val b: R|foo/bar/ImmutableBase| = R|foo/bar/ImmutableBase.ImmutableBase|()
+            public get(): R|foo/bar/ImmutableBase|
+
+        public final val c: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ Int(32)
+            }
+
+        public final var d: R|kotlin/Int| = Int(1)
+            public get(): R|kotlin/Int|
+            public set(value: R|kotlin/Int|): R|kotlin/Unit|
+
+        public final var e: R|foo/bar/ImmutableBase| = R|foo/bar/ImmutableBase.ImmutableBase|()
+            public get(): R|foo/bar/ImmutableBase|
+            public set(value: R|foo/bar/ImmutableBase|): R|kotlin/Unit|
+
+        public final var f: R|kotlin/Int|
+            public get(): R|kotlin/Int| {
+                ^ Int(32)
+            }
+            public set(value: R|kotlin/Int|): R|kotlin/Unit| {
+            }
+
+    }
