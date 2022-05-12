@@ -1,0 +1,44 @@
+FILE: simple.kt
+    package foo.bar
+
+    public open class Base : R|kotlin/Any| {
+        public constructor(): R|foo/bar/Base| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|org/itmo/my/pretty/plugin/LogActualClass|() public open fun foo(): R|kotlin/Unit| {
+            R|kotlin/io/println|(String(foo))
+        }
+
+        public open fun bar(): R|kotlin/Unit| {
+        }
+
+        public open fun baz(): R|kotlin/Unit| {
+        }
+
+    }
+    public final class Derived : R|foo/bar/Base| {
+        public constructor(): R|foo/bar/Derived| {
+            super<R|foo/bar/Base|>()
+        }
+
+        public final override fun foo(): R|kotlin/Unit| {
+        }
+
+        @R|org/itmo/my/pretty/plugin/LogActualClass|() public final override fun bar(): R|kotlin/Unit| {
+        }
+
+        public final override fun baz(): R|kotlin/Unit| {
+        }
+
+    }
+    public final fun callFuns(x: R|foo/bar/Base|): R|kotlin/Unit| {
+        R|<local>/x|.R|foo/bar/Base.foo|()
+        R|<local>/x|.R|foo/bar/Base.bar|()
+        R|<local>/x|.R|foo/bar/Base.baz|()
+    }
+    public final fun box(): R|kotlin/String| {
+        R|foo/bar/callFuns|(R|foo/bar/Base.Base|())
+        R|foo/bar/callFuns|(R|foo/bar/Derived.Derived|())
+        ^box String(OK)
+    }

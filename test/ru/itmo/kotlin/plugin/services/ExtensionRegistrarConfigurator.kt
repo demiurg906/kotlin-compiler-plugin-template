@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.TestServices
 import ru.itmo.kotlin.plugin.SimplePluginRegistrar
-import ru.itmo.kotlin.plugin.ir.SimpleIrBodyGenerator
 import ru.itmo.kotlin.plugin.ir.SimpleIrGenerationExtension
 
 class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentConfigurator(testServices) {
