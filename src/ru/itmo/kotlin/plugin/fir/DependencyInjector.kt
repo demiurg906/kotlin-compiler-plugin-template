@@ -1,13 +1,11 @@
 package ru.itmo.kotlin.plugin.fir
 
-import org.jetbrains.kotlin.KtSourceElement
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.containingClassForStaticMemberAttr
 import org.jetbrains.kotlin.fir.declarations.FirPluginKey
-import org.jetbrains.kotlin.fir.declarations.builder.buildBackingField
 import org.jetbrains.kotlin.fir.declarations.builder.buildProperty
 import org.jetbrains.kotlin.fir.declarations.findArgumentByName
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
@@ -30,11 +28,10 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.realElement
 
 class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtension(session) {
     companion object {
-        private val PACKAGE = FqName.topLevel(Name.identifier("org.itmo.my.pretty.plugin"))
+        val PACKAGE = FqName.topLevel(Name.identifier("org.itmo.my.pretty.plugin"))
         val injectedFQ = FqName("org.itmo.my.pretty.plugin.Injected")
         val INJECTED_PREDICATE: DeclarationPredicate = has(injectedFQ)
         val injectableFQ = FqName("org.itmo.my.pretty.plugin.Injectable")
@@ -55,9 +52,8 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
     override fun generateProperties(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirPropertySymbol> {
         if (owner == null || !owner.annotations.any { it.fqName(session) == injectableFQ }) return emptyList()
         return matchedInjected.map {
-            val psymbol = FirPropertySymbol(callableId)
+            val propSymbol = FirPropertySymbol(callableId)
             val returnType = buildResolvedTypeRef { type = it.classId.toConeType() }
-            val bName = Name.identifier("$${callableId.callableName.asString()}")
             val pStatus = FirResolvedDeclarationStatusImpl(
                 Visibilities.Public, Modality.FINAL, EffectiveVisibility.Public
             )
@@ -68,7 +64,7 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
                     origin = Key.origin,
                     propertyTypeRef = returnType,
                     visibility = Visibilities.Public,
-                    propertySymbol = psymbol,
+                    propertySymbol = propSymbol,
                     effectiveVisibility = EffectiveVisibility.Public
                 )
 
@@ -77,7 +73,7 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
                 status = pStatus
                 isVar = false
                 isLocal = false
-                symbol = psymbol
+                symbol = propSymbol
                 name = callableId.callableName
                 returnTypeRef = returnType
             }.also { it.containingClassForStaticMemberAttr = ConeClassLikeLookupTagImpl(owner.classId) }.symbol

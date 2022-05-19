@@ -13,3 +13,12 @@ FILE: simple.kt
         }
 
     }
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(y)) public final class InjectedImpl3 : R|kotlin/Any| {
+        public constructor(data: R|kotlin/Int|): R|foo/bar/InjectedImpl3| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val data: R|kotlin/Int| = R|<local>/data|
+            public get(): R|kotlin/Int|
+
+    }

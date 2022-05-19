@@ -12,8 +12,7 @@ import org.jetbrains.kotlin.diagnostics.error2
 import org.jetbrains.kotlin.diagnostics.warning1
 
 object PluginErrors {
-    val INJECTED_PROPERTY_NAME_ALREADY_EXISTS by error1<PsiElement, String>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
+    val NO_CONSTRUCTOR by error1<PsiElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
     val MULTIPLE_NAME_DEFINITIONS by error1<PsiElement, String>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
     val WRONG_NAME_FORMAT by error1<PsiElement, String>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
-    val FUNCTION_WITH_DUMMY_NAME by warning1<PsiElement, String>(SourceElementPositioningStrategies.DECLARATION_NAME)
 }

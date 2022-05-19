@@ -1,8 +1,3 @@
-/*
- * Copyright 2010-2021 JetBrains s.r.o. and Kotlin Programming Language contributors.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the license/LICENSE.txt file.
- */
-
 package ru.itmo.kotlin.plugin.ir
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -55,7 +50,7 @@ class PropertyBodyTransformer(context: IrPluginContext) : IrElementVisitorVoid {
     }
     private val singleton by singletonLazy
 
-    private var isSingletonBinded = false
+    private var isSingletonBound = false
     override fun visitElement(element: IrElement) {
         when (element) {
             is IrDeclaration, is IrFile, is IrModuleFragment -> element.acceptChildrenVoid(this)
@@ -63,7 +58,7 @@ class PropertyBodyTransformer(context: IrPluginContext) : IrElementVisitorVoid {
         }
         if (element is IrFile && singletonLazy.isInitialized()) {
             element.bind(singleton)
-            isSingletonBinded = true
+            isSingletonBound = true
         }
     }
 

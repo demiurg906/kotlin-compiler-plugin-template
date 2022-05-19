@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.name.Name
 import ru.itmo.kotlin.plugin.fir.DependencyInjector
 
-class InjectedNameChecker(val session: FirSession) : FirAnnotationCallChecker() {
+class InjectedNameChecker(private val session: FirSession) : FirAnnotationCallChecker() {
     private val names = mutableMapOf<String, FirCall>()
     override fun check(expression: FirAnnotationCall, context: CheckerContext, reporter: DiagnosticReporter) {
         if (expression.fqName(session) != DependencyInjector.injectedFQ) return
@@ -31,5 +31,4 @@ class InjectedNameChecker(val session: FirSession) : FirAnnotationCallChecker() 
             names[argValue] = expression
         }
     }
-
 }
