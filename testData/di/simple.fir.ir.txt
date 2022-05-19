@@ -257,8 +257,8 @@ FILE fqName:foo.bar fileName:/simple.kt
               CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
               CONST String type=kotlin.String value=" times "
               GET_VAR 'val impl2: foo.bar.InjectableImpl2 [val] declared in foo.bar.box' type=foo.bar.InjectableImpl2 origin=null
-  CLASS OBJECT name:$DIClass modality:FINAL visibility:public superTypes:[kotlin.Any]
-    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> index:0 type:foo.bar.$DIClass
+  CLASS OBJECT name:$DIClass modality:FINAL visibility:public superTypes:[]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.$DIClass
     CONSTRUCTOR visibility:public <> () returnType:foo.bar.$DIClass [primary]
       BLOCK_BODY
         DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'

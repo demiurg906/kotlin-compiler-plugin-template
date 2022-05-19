@@ -13,19 +13,17 @@ import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.builders.declarations.addConstructor
 import org.jetbrains.kotlin.ir.builders.declarations.buildClass
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
+import org.jetbrains.kotlin.ir.builders.declarations.buildReceiverParameter
 import org.jetbrains.kotlin.ir.declarations.*
-import org.jetbrains.kotlin.ir.declarations.impl.IrValueParameterImpl
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrDelegatingConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetFieldImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrReturnImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrValueParameterSymbolImpl
 import org.jetbrains.kotlin.ir.types.getClass
-import org.jetbrains.kotlin.ir.types.impl.IrSimpleTypeImpl
+import org.jetbrains.kotlin.ir.types.typeWithParameters
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -36,27 +34,12 @@ class PropertyBodyTransformer(context: IrPluginContext) : IrElementVisitorVoid {
     private val irFactory = context.irFactory
     private val irBuiltIns = context.irBuiltIns
     private val injected = mutableMapOf<String, IrField>()
-    private val singleton by lazy {
+    private val singletonLazy = lazy {
         irFactory.buildClass {
             kind = ClassKind.OBJECT
             name = Name.identifier("\$DIClass")
         }.apply {
-            symbol
-            val type = IrSimpleTypeImpl(symbol, false, listOf(), listOf())
-            thisReceiver = IrValueParameterImpl(
-                -1,
-                -1,
-                IrDeclarationOrigin.INSTANCE_RECEIVER,
-                IrValueParameterSymbolImpl(),
-                Name.identifier("<this>"),
-                0,
-                type,
-                null,
-                false,
-                false,
-                false,
-                false
-            )
+            thisReceiver = buildReceiverParameter(this, IrDeclarationOrigin.INSTANCE_RECEIVER, symbol.typeWithParameters(typeParameters))
             addConstructor {
                 isPrimary = true
             }.apply {
@@ -68,20 +51,19 @@ class PropertyBodyTransformer(context: IrPluginContext) : IrElementVisitorVoid {
                     )
                 )
             }
-            thisReceiver!!.parent = this
-            superTypes = listOf(irBuiltIns.anyType)
         }
     }
+    private val singleton by singletonLazy
 
+    private var isSingletonBinded = false
     override fun visitElement(element: IrElement) {
         when (element) {
             is IrDeclaration, is IrFile, is IrModuleFragment -> element.acceptChildrenVoid(this)
             else -> {}
         }
-        if (element is IrClass) println(element.dump())
-        if (element is IrFile) {
-            singleton.parent = element
-            element.declarations.add(singleton)
+        if (element is IrFile && singletonLazy.isInitialized()) {
+            element.bind(singleton)
+            isSingletonBinded = true
         }
     }
 
