@@ -61,17 +61,6 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
             val pStatus = FirResolvedDeclarationStatusImpl(
                 Visibilities.Public, Modality.FINAL, EffectiveVisibility.Public
             )
-            val backingField = buildBackingField {
-                moduleData = session.moduleData
-                origin = Key.origin
-                status = pStatus
-                isVar = false
-                isVal = true
-                propertySymbol = psymbol
-                name = bName
-                symbol = FirBackingFieldSymbol(CallableId(owner.classId, bName))
-                returnTypeRef = returnType
-            }
             buildProperty {
                 getter = FirDefaultPropertyGetter(
                     source = owner.source,
@@ -82,7 +71,6 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
                     propertySymbol = psymbol,
                     effectiveVisibility = EffectiveVisibility.Public
                 )
-                this.backingField = backingField
 
                 moduleData = session.moduleData
                 origin = Key.origin

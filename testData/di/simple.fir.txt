@@ -16,6 +16,15 @@ FILE: simple.kt
         }
 
     }
+    public final object xxx : R|kotlin/Any| {
+        private constructor(): R|foo/bar/xxx| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val t: R|kotlin/Int| = Int(0)
+            public get(): R|kotlin/Int|
+
+    }
     public final var ext: R|kotlin/Int| = Int(0)
         public get(): R|kotlin/Int|
         public set(value: R|kotlin/Int|): R|kotlin/Unit|
@@ -38,7 +47,6 @@ FILE: simple.kt
         }
 
         public final val x: R|foo/bar/InjectedImpl|
-            public <explicit backing field>: R|foo/bar/InjectedImpl|
             public get(): R|foo/bar/InjectedImpl|
 
     }
@@ -48,7 +56,6 @@ FILE: simple.kt
         }
 
         public final val x: R|foo/bar/InjectedImpl|
-            public <explicit backing field>: R|foo/bar/InjectedImpl|
             public get(): R|foo/bar/InjectedImpl|
 
     }

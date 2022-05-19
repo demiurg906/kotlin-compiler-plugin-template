@@ -7,6 +7,9 @@ import org.itmo.my.pretty.plugin.Injected
 annotation class OtherAnnotation(val name: String)
 @OtherAnnotation(name = "x")
 class ClassWithoutErrors
+object xxx {
+    val t: Int = 0
+}
 //1. Всякое Dependency Injection (можно, например, автоматом добавлять поля для всех injectable сущностей)
 var ext = 0
 @Injected(name = "x")
