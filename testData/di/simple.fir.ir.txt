@@ -1,0 +1,237 @@
+FILE fqName:foo.bar fileName:/simple.kt
+  CLASS ANNOTATION_CLASS name:OtherAnnotation modality:OPEN visibility:public superTypes:[kotlin.Annotation]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.OtherAnnotation
+    CONSTRUCTOR visibility:public <> (name:kotlin.String) returnType:foo.bar.OtherAnnotation [primary]
+      VALUE_PARAMETER name:name index:0 type:kotlin.String
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS ANNOTATION_CLASS name:OtherAnnotation modality:OPEN visibility:public superTypes:[kotlin.Annotation]'
+    PROPERTY name:name visibility:public modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:name type:kotlin.String visibility:private [final]
+        EXPRESSION_BODY
+          GET_VAR 'name: kotlin.String declared in foo.bar.OtherAnnotation.<init>' type=kotlin.String origin=INITIALIZE_PROPERTY_FROM_PARAMETER
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-name> visibility:public modality:FINAL <> ($this:foo.bar.OtherAnnotation) returnType:kotlin.String
+        correspondingProperty: PROPERTY name:name visibility:public modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.OtherAnnotation
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun <get-name> (): kotlin.String declared in foo.bar.OtherAnnotation'
+            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:name type:kotlin.String visibility:private [final]' type=kotlin.String origin=null
+              receiver: GET_VAR '<this>: foo.bar.OtherAnnotation declared in foo.bar.OtherAnnotation.<get-name>' type=foo.bar.OtherAnnotation origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [fake_override,operator] declared in kotlin.Annotation
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int [fake_override] declared in kotlin.Annotation
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String [fake_override] declared in kotlin.Annotation
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  CLASS CLASS name:ClassWithoutErrors modality:FINAL visibility:public superTypes:[kotlin.Any]
+    annotations:
+      OtherAnnotation(name = 'x')
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.ClassWithoutErrors
+    CONSTRUCTOR visibility:public <> () returnType:foo.bar.ClassWithoutErrors [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:ClassWithoutErrors modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  PROPERTY name:ext visibility:public modality:FINAL [var]
+    FIELD PROPERTY_BACKING_FIELD name:ext type:kotlin.Int visibility:private [static]
+      EXPRESSION_BODY
+        CONST Int type=kotlin.Int value=0
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ext> visibility:public modality:FINAL <> () returnType:kotlin.Int
+      correspondingProperty: PROPERTY name:ext visibility:public modality:FINAL [var]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun <get-ext> (): kotlin.Int declared in foo.bar'
+          GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:ext type:kotlin.Int visibility:private [static]' type=kotlin.Int origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<set-ext> visibility:public modality:FINAL <> (<set-?>:kotlin.Int) returnType:kotlin.Unit
+      correspondingProperty: PROPERTY name:ext visibility:public modality:FINAL [var]
+      VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Int
+      BLOCK_BODY
+        SET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:ext type:kotlin.Int visibility:private [static]' type=kotlin.Unit origin=null
+          value: GET_VAR '<set-?>: kotlin.Int declared in foo.bar.<set-ext>' type=kotlin.Int origin=null
+  CLASS CLASS name:InjectedImpl modality:FINAL visibility:public superTypes:[kotlin.Any]
+    annotations:
+      Injected(name = 'x')
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.InjectedImpl
+    CONSTRUCTOR visibility:public <> () returnType:foo.bar.InjectedImpl [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:InjectedImpl modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    ANONYMOUS_INITIALIZER isStatic=false
+      BLOCK_BODY
+        CALL 'public final fun <set-ext> (<set-?>: kotlin.Int): kotlin.Unit declared in foo.bar' type=kotlin.Unit origin=EQ
+          <set-?>: CALL 'public final fun plus (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=null
+            $this: CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
+            other: CONST Int type=kotlin.Int value=1
+    PROPERTY name:inner visibility:public modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:inner type:kotlin.Int visibility:private [final]
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=3
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-inner> visibility:public modality:FINAL <> ($this:foo.bar.InjectedImpl) returnType:kotlin.Int
+        correspondingProperty: PROPERTY name:inner visibility:public modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.InjectedImpl
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun <get-inner> (): kotlin.Int declared in foo.bar.InjectedImpl'
+            GET_FIELD 'FIELD PROPERTY_BACKING_FIELD name:inner type:kotlin.Int visibility:private [final]' type=kotlin.Int origin=null
+              receiver: GET_VAR '<this>: foo.bar.InjectedImpl declared in foo.bar.InjectedImpl.<get-inner>' type=foo.bar.InjectedImpl origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  CLASS CLASS name:InjectableImpl modality:FINAL visibility:public superTypes:[kotlin.Any]
+    annotations:
+      Injectable
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.InjectableImpl
+    CONSTRUCTOR visibility:public <> () returnType:foo.bar.InjectableImpl [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:InjectableImpl modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY GENERATED[DependencyInjector] name:x visibility:public modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:x type:foo.bar.InjectedImpl visibility:private [final]
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:foo.bar.InjectableImpl) returnType:foo.bar.InjectedImpl
+        correspondingProperty: PROPERTY GENERATED[DependencyInjector] name:x visibility:public modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.InjectableImpl
+        BLOCK_BODY
+          RETURN type=foo.bar.InjectedImpl from='public final fun <get-x> (): foo.bar.InjectedImpl declared in foo.bar.InjectableImpl'
+            GET_FIELD 'FIELD name:x type:foo.bar.InjectedImpl visibility:public [static]' type=foo.bar.InjectedImpl origin=GET_PROPERTY
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  CLASS CLASS name:InjectableImpl2 modality:FINAL visibility:public superTypes:[kotlin.Any]
+    annotations:
+      Injectable
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.InjectableImpl2
+    CONSTRUCTOR visibility:public <> () returnType:foo.bar.InjectableImpl2 [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:InjectableImpl2 modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    PROPERTY GENERATED[DependencyInjector] name:x visibility:public modality:FINAL [val]
+      FIELD PROPERTY_BACKING_FIELD name:x type:foo.bar.InjectedImpl visibility:private [final]
+      FUN DEFAULT_PROPERTY_ACCESSOR name:<get-x> visibility:public modality:FINAL <> ($this:foo.bar.InjectableImpl2) returnType:foo.bar.InjectedImpl
+        correspondingProperty: PROPERTY GENERATED[DependencyInjector] name:x visibility:public modality:FINAL [val]
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.InjectableImpl2
+        BLOCK_BODY
+          RETURN type=foo.bar.InjectedImpl from='public final fun <get-x> (): foo.bar.InjectedImpl declared in foo.bar.InjectableImpl2'
+            GET_FIELD 'FIELD name:x type:foo.bar.InjectedImpl visibility:public [static]' type=foo.bar.InjectedImpl origin=GET_PROPERTY
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
+    BLOCK_BODY
+      VAR name:impl type:foo.bar.InjectableImpl [val]
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in foo.bar.InjectableImpl' type=foo.bar.InjectableImpl origin=null
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: WHEN type=kotlin.Boolean origin=OROR
+            BRANCH
+              if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+                $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+                  arg0: CALL 'public final fun <get-inner> (): kotlin.Int declared in foo.bar.InjectedImpl' type=kotlin.Int origin=GET_PROPERTY
+                    $this: CALL 'public final fun <get-x> (): foo.bar.InjectedImpl declared in foo.bar.InjectableImpl' type=foo.bar.InjectedImpl origin=GET_PROPERTY
+                      $this: GET_VAR 'val impl: foo.bar.InjectableImpl [val] declared in foo.bar.box' type=foo.bar.InjectableImpl origin=null
+                  arg1: CONST Int type=kotlin.Int value=3
+              then: CONST Boolean type=kotlin.Boolean value=true
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+                $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+                  arg0: CALL 'public final fun <get-inner> (): kotlin.Int declared in foo.bar.InjectedImpl' type=kotlin.Int origin=GET_PROPERTY
+                    $this: CALL 'public final fun <get-x> (): foo.bar.InjectedImpl declared in foo.bar.InjectableImpl' type=foo.bar.InjectedImpl origin=GET_PROPERTY
+                      $this: GET_VAR 'val impl: foo.bar.InjectableImpl [val] declared in foo.bar.box' type=foo.bar.InjectableImpl origin=null
+                  arg1: CONST Int type=kotlin.Int value=3
+          then: RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in foo.bar'
+            STRING_CONCATENATION type=kotlin.String
+              CONST String type=kotlin.String value="Fail with wrong initializer: "
+              GET_VAR 'val impl: foo.bar.InjectableImpl [val] declared in foo.bar.box' type=foo.bar.InjectableImpl origin=null
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+            $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+              arg0: CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
+              arg1: CONST Int type=kotlin.Int value=1
+          then: RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in foo.bar'
+            STRING_CONCATENATION type=kotlin.String
+              CONST String type=kotlin.String value="Initialized "
+              CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
+              CONST String type=kotlin.String value=" times instead: "
+              GET_VAR 'val impl: foo.bar.InjectableImpl [val] declared in foo.bar.box' type=foo.bar.InjectableImpl origin=null
+      VAR name:impl2 type:foo.bar.InjectableImpl2 [val]
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in foo.bar.InjectableImpl2' type=foo.bar.InjectableImpl2 origin=null
+      RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in foo.bar'
+        WHEN type=kotlin.String origin=IF
+          BRANCH
+            if: WHEN type=kotlin.Boolean origin=ANDAND
+              BRANCH
+                if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                  arg0: CALL 'public final fun <get-inner> (): kotlin.Int declared in foo.bar.InjectedImpl' type=kotlin.Int origin=GET_PROPERTY
+                    $this: CALL 'public final fun <get-x> (): foo.bar.InjectedImpl declared in foo.bar.InjectableImpl2' type=foo.bar.InjectedImpl origin=GET_PROPERTY
+                      $this: GET_VAR 'val impl2: foo.bar.InjectableImpl2 [val] declared in foo.bar.box' type=foo.bar.InjectableImpl2 origin=null
+                  arg1: CONST Int type=kotlin.Int value=3
+                then: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                  arg0: CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
+                  arg1: CONST Int type=kotlin.Int value=1
+              BRANCH
+                if: CONST Boolean type=kotlin.Boolean value=true
+                then: CONST Boolean type=kotlin.Boolean value=false
+            then: CONST String type=kotlin.String value="OK"
+          BRANCH
+            if: CONST Boolean type=kotlin.Boolean value=true
+            then: STRING_CONCATENATION type=kotlin.String
+              CONST String type=kotlin.String value="Fail: initiialized "
+              CALL 'public final fun <get-ext> (): kotlin.Int declared in foo.bar' type=kotlin.Int origin=GET_PROPERTY
+              CONST String type=kotlin.String value=" times "
+              GET_VAR 'val impl2: foo.bar.InjectableImpl2 [val] declared in foo.bar.box' type=foo.bar.InjectableImpl2 origin=null
+  CLASS OBJECT name:$DIClass modality:FINAL visibility:public superTypes:[]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.$DIClass
+    CONSTRUCTOR visibility:public <> () returnType:foo.bar.$DIClass [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+    FIELD name:x type:foo.bar.InjectedImpl visibility:public [static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in foo.bar.InjectedImpl' type=foo.bar.InjectedImpl origin=null

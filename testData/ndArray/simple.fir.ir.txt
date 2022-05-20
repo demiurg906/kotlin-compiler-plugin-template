@@ -1,0 +1,61 @@
+FILE fqName:foo.bar fileName:/simple.kt
+  FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
+    BLOCK_BODY
+      VAR name:x type:kotlin.Array<kotlin.Array<kotlin.Int>> [val]
+        CONSTRUCTOR_CALL 'public constructor <init> (size: kotlin.Int, init: kotlin.Function1<kotlin.Int, T of kotlin.Array>) declared in kotlin.Array' type=kotlin.Array<kotlin.Array<kotlin.Int>> origin=null
+          <class: T>: kotlin.Int
+          size: CONST Int type=kotlin.Int value=5
+          init: FUN_EXPR type=kotlin.Function1<kotlin.Int, kotlin.Array<kotlin.Int>> origin=LAMBDA
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (it:kotlin.Int) returnType:kotlin.Array<kotlin.Int>
+              VALUE_PARAMETER name:it index:0 type:kotlin.Int
+              BLOCK_BODY
+                RETURN type=kotlin.Nothing from='local final fun <anonymous> (it: kotlin.Int): kotlin.Array<kotlin.Int> declared in foo.bar.box'
+                  CALL 'public final fun arrayOf <T> (vararg elements: T of kotlin.arrayOf): kotlin.Array<T of kotlin.arrayOf> [inline] declared in kotlin' type=kotlin.Array<kotlin.Int> origin=null
+                    <T>: kotlin.Int
+                    elements: VARARG type=kotlin.Array<out kotlin.Int> varargElementType=kotlin.Int
+                      CONST Int type=kotlin.Int value=1
+                      CONST Int type=kotlin.Int value=2
+                      CONST Int type=kotlin.Int value=3
+      RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in foo.bar'
+        WHEN type=kotlin.String origin=IF
+          BRANCH
+            if: WHEN type=kotlin.Boolean origin=OROR
+              BRANCH
+                if: WHEN type=kotlin.Boolean origin=OROR
+                  BRANCH
+                    if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+                      $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+                        arg0: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Int origin=null
+                          $this: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Array<kotlin.Int> origin=null
+                            $this: GET_VAR 'val x: kotlin.Array<kotlin.Array<kotlin.Int>> [val] declared in foo.bar.box' type=kotlin.Array<kotlin.Array<kotlin.Int>> origin=null
+                            index: CONST Int type=kotlin.Int value=0
+                          index: CONST Int type=kotlin.Int value=0
+                        arg1: CONST Int type=kotlin.Int value=1
+                    then: CONST Boolean type=kotlin.Boolean value=true
+                  BRANCH
+                    if: CONST Boolean type=kotlin.Boolean value=true
+                    then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+                      $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+                        arg0: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Int origin=null
+                          $this: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Array<kotlin.Int> origin=null
+                            $this: GET_VAR 'val x: kotlin.Array<kotlin.Array<kotlin.Int>> [val] declared in foo.bar.box' type=kotlin.Array<kotlin.Array<kotlin.Int>> origin=null
+                            index: CONST Int type=kotlin.Int value=0
+                          index: CONST Int type=kotlin.Int value=1
+                        arg1: CONST Int type=kotlin.Int value=2
+                then: CONST Boolean type=kotlin.Boolean value=true
+              BRANCH
+                if: CONST Boolean type=kotlin.Boolean value=true
+                then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=EXCLEQ
+                  $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EXCLEQ
+                    arg0: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Int origin=null
+                      $this: CALL 'public final fun get (index: kotlin.Int): T of kotlin.Array [operator] declared in kotlin.Array' type=kotlin.Array<kotlin.Int> origin=null
+                        $this: GET_VAR 'val x: kotlin.Array<kotlin.Array<kotlin.Int>> [val] declared in foo.bar.box' type=kotlin.Array<kotlin.Array<kotlin.Int>> origin=null
+                        index: CONST Int type=kotlin.Int value=0
+                      index: CONST Int type=kotlin.Int value=2
+                    arg1: CONST Int type=kotlin.Int value=3
+            then: STRING_CONCATENATION type=kotlin.String
+              CONST String type=kotlin.String value="Wrong array generated: "
+              GET_VAR 'val x: kotlin.Array<kotlin.Array<kotlin.Int>> [val] declared in foo.bar.box' type=kotlin.Array<kotlin.Array<kotlin.Int>> origin=null
+          BRANCH
+            if: CONST Boolean type=kotlin.Boolean value=true
+            then: CONST String type=kotlin.String value="OK"

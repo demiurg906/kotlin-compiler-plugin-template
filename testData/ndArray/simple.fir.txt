@@ -1,0 +1,31 @@
+FILE: simple.kt
+    package foo.bar
+
+    public final fun box(): R|kotlin/String| {
+        lval x: R|kotlin/Array<foo/bar/Array1<kotlin/Int>>| = R|kotlin/Array.Array|<R|kotlin/Int|>(Int(5), <L> = Array2@fun <anonymous>(it: R|kotlin/Int|): R|foo/bar/Array1<kotlin/Int>| <inline=Inline>  {
+            ^ R|kotlin/arrayOf|<R|kotlin/Int|>(vararg(Int(1), Int(2), Int(3)))
+        }
+        )
+        ^box when () {
+            !=(R|<local>/x|.R|SubstitutionOverride<kotlin/Array.get: R|foo/bar/Array1<kotlin/Int>|>|(Int(0)).R|SubstitutionOverride<kotlin/Array.get: R|kotlin/Int|>|(Int(0)), Int(1)) || !=(R|<local>/x|.R|SubstitutionOverride<kotlin/Array.get: R|foo/bar/Array1<kotlin/Int>|>|(Int(0)).R|SubstitutionOverride<kotlin/Array.get: R|kotlin/Int|>|(Int(1)), Int(2)) || !=(R|<local>/x|.R|SubstitutionOverride<kotlin/Array.get: R|foo/bar/Array1<kotlin/Int>|>|(Int(0)).R|SubstitutionOverride<kotlin/Array.get: R|kotlin/Int|>|(Int(2)), Int(3)) ->  {
+                <strcat>(String(Wrong array generated: ), R|<local>/x|)
+            }
+            else ->  {
+                String(OK)
+            }
+        }
+
+    }
+FILE: __GENERATED DECLARATIONS__.kt
+    package foo.bar
+
+    public final typealias Array1<T> = R|kotlin/Array<CONFLICTING-PROJECTION T>|
+    public final typealias Array2<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array1<T>>|
+    public final typealias Array3<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array2<T>>|
+    public final typealias Array4<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array3<T>>|
+    public final typealias Array5<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array4<T>>|
+    public final typealias Array6<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array5<T>>|
+    public final typealias Array7<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array6<T>>|
+    public final typealias Array8<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array7<T>>|
+    public final typealias Array9<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array8<T>>|
+    public final typealias Array10<T> = R|kotlin/Array<CONFLICTING-PROJECTION foo/bar/Array9<T>>|

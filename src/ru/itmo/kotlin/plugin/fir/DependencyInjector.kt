@@ -28,6 +28,10 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+fun ClassId.toConeType(typeArguments: Array<ConeTypeProjection> = emptyArray()): ConeClassLikeType {
+    val lookupTag = ConeClassLikeLookupTagImpl(this)
+    return ConeClassLikeTypeImpl(lookupTag, typeArguments, isNullable = false)
+}
 
 class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtension(session) {
     companion object {
@@ -78,11 +82,6 @@ class DependencyInjector(session: FirSession) : FirDeclarationGenerationExtensio
                 returnTypeRef = returnType
             }.also { it.containingClassForStaticMemberAttr = ConeClassLikeLookupTagImpl(owner.classId) }.symbol
         }
-    }
-
-    private fun ClassId.toConeType(typeArguments: Array<ConeTypeProjection> = emptyArray()): ConeClassLikeType {
-        val lookupTag = ConeClassLikeLookupTagImpl(this)
-        return ConeClassLikeTypeImpl(lookupTag, typeArguments, isNullable = false)
     }
 
     override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>): Set<Name> {
