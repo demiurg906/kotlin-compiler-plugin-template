@@ -1,19 +1,76 @@
 FILE: simple.kt
     package foo.bar
 
+    @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun checkThatGreaterThan42(x: R|kotlin/Int|): R|kotlin/Boolean| {
+        ^checkThatGreaterThan42 CMP(>, R|<local>/x|.R|kotlin/Int.compareTo|(Int(42)))
+    }
+    @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun execFoo(obj: R|foo/bar/SimpleClass|): R|kotlin/Unit| {
+        R|<local>/obj|.R|foo/bar/SimpleClass.foo|(y = String())
+    }
     public final class SimpleClass : R|kotlin/Any| {
         public constructor(): R|foo/bar/SimpleClass| {
             super<R|kotlin/Any|>()
         }
 
-        @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun topLevelSuspend(x: R|kotlin/Double| = Double(0.42)): R|kotlin/String| {
-            ^topLevelSuspend R|<local>/x|.R|kotlin/Any.toString|()
+        @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun foo(x: R|kotlin/Double| = Double(0.42), unused: R|kotlin/Int| = Int(42), y: R|kotlin/String|): R|kotlin/String| {
+            ^foo <strcat>(R|<local>/y|, String( is ), R|<local>/x|)
         }
 
-        public final fun topLevelSuspendAsync(x: R|kotlin/Double| = Double(0.42)): R|java/util/concurrent/Future<kotlin/String>| {
-            ^topLevelSuspendAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
+        public final companion object Companion : R|kotlin/Any| {
+            private constructor(): R|foo/bar/SimpleClass.Companion| {
+                super<R|kotlin/Any|>()
+            }
+
+            @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun fooStatic(message: R|kotlin/String| = String(world)): R|kotlin/String| {
+                ^fooStatic <strcat>(String(Hello, ), R|<local>/message|, String(!))
+            }
+
+            public final fun fooStaticAsync(message: R|kotlin/String| = String(world)): R|java/util/concurrent/Future<kotlin/String>| {
+                ^fooStaticAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
+                    ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/String|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/String| <inline=NoInline, kind=EXACTLY_ONCE>  {
+                        ^ this@R|foo/bar/SimpleClass.Companion|.R|foo/bar/SimpleClass.Companion.fooStatic|(R|<local>/message|)
+                    }
+                    )
+                }
+                )
+            }
+
+        }
+
+        public final fun fooAsync(x: R|kotlin/Double| = Double(0.42), unused: R|kotlin/Int| = Int(42), y: R|kotlin/String|): R|java/util/concurrent/Future<kotlin/String>| {
+            ^fooAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
                 ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/String|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/String| <inline=NoInline, kind=EXACTLY_ONCE>  {
-                    ^ this@R|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.topLevelSuspend|()
+                    ^ this@R|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.foo|(R|<local>/x|, R|<local>/unused|, R|<local>/y|)
+                }
+                )
+            }
+            )
+        }
+
+    }
+    public final object SimpleObject : R|kotlin/Any| {
+        private constructor(): R|foo/bar/SimpleObject| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun bar(start: R|kotlin/Int| = Int(0), step: R|kotlin/Int| = Int(1), count: R|kotlin/Int| = Int(10)): R|kotlin/Int| {
+            lvar result: R|kotlin/Int| = Int(0)
+             {
+                lval <iterator>: R|kotlin/collections/IntIterator| = R|<local>/start|.R|kotlin/ranges/until|(R|<local>/count|.R|kotlin/Int.times|(R|<local>/step|).R|kotlin/Int.plus|(R|<local>/start|)).R|kotlin/ranges/step|(R|<local>/step|).R|kotlin/ranges/IntProgression.iterator|()
+                while(R|<local>/<iterator>|.R|SubstitutionOverride<kotlin/collections/IntIterator.hasNext: R|kotlin/Boolean|>|()) {
+                    lval i: R|kotlin/Int| = R|<local>/<iterator>|.R|kotlin/collections/IntIterator.next|()
+                    R|<local>/result| = R|<local>/result|.R|kotlin/Int.plus|(R|<local>/i|)
+                }
+
+            }
+
+            ^bar R|<local>/result|
+        }
+
+        public final fun barAsync(start: R|kotlin/Int| = Int(0), step: R|kotlin/Int| = Int(1), count: R|kotlin/Int| = Int(10)): R|java/util/concurrent/Future<kotlin/Int>| {
+            ^barAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/Int, kotlin/Int?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/Int, kotlin/Int?>| <inline=NoInline>  {
+                ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/Int|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/Int| <inline=NoInline, kind=EXACTLY_ONCE>  {
+                    ^ this@R|foo/bar/SimpleObject|.R|foo/bar/SimpleObject.bar|(R|<local>/start|, R|<local>/step|, R|<local>/count|)
                 }
                 )
             }
@@ -22,8 +79,44 @@ FILE: simple.kt
 
     }
     public final fun box(): R|kotlin/String| {
-        R|foo/bar/SimpleClass.SimpleClass|().R|foo/bar/SimpleClass.topLevelSuspendAsync|(Double(0.5))
-        ^box String(OK)
+        lval simpleClass: R|foo/bar/SimpleClass| = R|foo/bar/SimpleClass.SimpleClass|()
+        lval results: R|kotlin/collections/List<kotlin/Boolean>| = R|kotlinx/coroutines/runBlocking|<R|kotlin/collections/List<kotlin/Boolean>|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/collections/List<kotlin/Boolean>| <inline=NoInline, kind=EXACTLY_ONCE>  {
+            ^@runBlocking R|kotlin/collections/listOf|<R|kotlin/Boolean|>(vararg(==(R|foo/bar/checkThatGreaterThan42|(Int(43)), R|foo/bar/checkThatGreaterThan42Async|(Int(43)).R|SubstitutionOverride<java/util/concurrent/Future.get: R|ft<kotlin/Boolean, kotlin/Boolean?>|>|()), ==(R|<local>/simpleClass|.R|foo/bar/SimpleClass.foo|(x = Double(0.5), y = String(good)), R|<local>/simpleClass|.R|foo/bar/SimpleClass.fooAsync|(y = String(good), x = Double(0.5)).R|SubstitutionOverride<java/util/concurrent/Future.get: R|ft<kotlin/String, kotlin/String?>|>|()), ==(Q|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.Companion.fooStatic|(String(world)), Q|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.Companion.fooStaticAsync|().R|SubstitutionOverride<java/util/concurrent/Future.get: R|ft<kotlin/String, kotlin/String?>|>|()), ==(Q|foo/bar/SimpleObject|.R|foo/bar/SimpleObject.bar|(Int(10), Int(5), Int(10)), Q|foo/bar/SimpleObject|.R|foo/bar/SimpleObject.barAsync|(Int(10), Int(5), Int(10)).R|SubstitutionOverride<java/util/concurrent/Future.get: R|ft<kotlin/Int, kotlin/Int?>|>|())))
+        }
+        )
+        ^box when () {
+            R|<local>/results|.R|kotlin/collections/all|<R|kotlin/Boolean|>(<L> = all@fun <anonymous>(it: R|kotlin/Boolean|): R|kotlin/Boolean| <inline=Inline, kind=UNKNOWN>  {
+                ^ R|<local>/it|
+            }
+            ) ->  {
+                String(OK)
+            }
+            else ->  {
+                String(error: some values are not equals)
+            }
+        }
+
+    }
+FILE: __GENERATED DECLARATIONS__.kt
+    package foo.bar
+
+    public final fun execFooAsync(obj: R|foo/bar/SimpleClass|): R|java/util/concurrent/Future<kotlin/Unit>| {
+        ^execFooAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/Unit, kotlin/Unit?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/Unit, kotlin/Unit?>| <inline=NoInline>  {
+            ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/Unit|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/Unit| <inline=NoInline, kind=EXACTLY_ONCE>  {
+                ^ R|foo/bar/execFoo|(R|<local>/obj|)
+            }
+            )
+        }
+        )
+    }
+    public final fun checkThatGreaterThan42Async(x: R|kotlin/Int|): R|java/util/concurrent/Future<kotlin/Boolean>| {
+        ^checkThatGreaterThan42Async R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/Boolean, kotlin/Boolean?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/Boolean, kotlin/Boolean?>| <inline=NoInline>  {
+            ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/Boolean|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/Boolean| <inline=NoInline, kind=EXACTLY_ONCE>  {
+                ^ R|foo/bar/checkThatGreaterThan42|(R|<local>/x|)
+            }
+            )
+        }
+        )
     }
 FILE: __GENERATED DECLARATIONS__.kt
     package ru.itmo.kotlin.plugin.desuspender

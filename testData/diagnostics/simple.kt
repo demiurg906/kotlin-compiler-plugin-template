@@ -1,9 +1,17 @@
+// FULL_JDK
+
 package foo.bar
 
-import org.itmo.my.pretty.plugin.SomeAnnotation
+import ru.itmo.kotlin.plugin.desuspender.DeSuspend
 
-@SomeAnnotation
-fun test() {
-    val s = MyClass().foo()
-    s.<!UNRESOLVED_REFERENCE!>inc<!>() // should be an error
+
+<!WRONG_ANNOTATION_TARGET!>@DeSuspend<!>
+class MyClass {
+    suspend fun foo() = "Hello, world!"
 }
+
+<!ILLEGAL_ANNOTATED_FUNCTION!>@DeSuspend
+fun test() {
+    val s = MyClass()
+    s.<!UNRESOLVED_REFERENCE!>fooAsync<!>()
+}<!>

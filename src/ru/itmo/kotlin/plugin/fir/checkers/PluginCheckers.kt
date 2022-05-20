@@ -9,17 +9,16 @@ import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.name.ClassId
 import ru.itmo.kotlin.plugin.fir.Names
 
-object AnnotatedIsSuspendChecker : FirSimpleFunctionChecker() {
+object AnnotatedIsSuspendFunctionChecker : FirSimpleFunctionChecker() {
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (declaration.hasAnnotation(ClassId(Names.PACKAGE_FQN, Names.ANNOTATION_NAME)) && !declaration.status.isSuspend) {
-            reporter.reportOn(declaration.source, PluginErrors.ILLEGAL_ANNOTATED_FUNCTION,
-                "DeSuspend can annotate only suspend functions", declaration.name.asString(), context)
+        if (declaration.hasAnnotation(
+                ClassId(
+                    Names.PACKAGE_FQN,
+                    Names.ANNOTATION_NAME
+                )
+            ) && !declaration.status.isSuspend
+        ) {
+            reporter.reportOn(declaration.source, PluginErrors.ILLEGAL_ANNOTATED_FUNCTION, context)
         }
     }
 }
-
-//object AlreadyDeSuspendedChecker : FirSimpleFunctionChecker() {
-//    override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
-//        declaration.annotations
-//    }
-//}

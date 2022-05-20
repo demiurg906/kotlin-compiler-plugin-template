@@ -7,6 +7,6 @@ import ru.itmo.kotlin.plugin.fir.PluginAdditionalCheckers
 class DeSuspendPluginRegistrar : FirExtensionRegistrar() {
     override fun ExtensionRegistrarContext.configurePlugin() {
         +::AsyncFunctionGenerator
-//        +::PluginAdditionalCheckers
+        +::PluginAdditionalCheckers
     }
 }

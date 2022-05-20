@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirFunctionTarget
 import org.jetbrains.kotlin.fir.FirSession
+import org.jetbrains.kotlin.fir.analysis.checkers.PsiSourceNavigator.getRawName
 import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
 import org.jetbrains.kotlin.fir.analysis.checkers.unsubstitutedScope
 import org.jetbrains.kotlin.fir.builder.buildLabel
@@ -21,6 +22,7 @@ import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyBackingField
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibility
+import org.jetbrains.kotlin.fir.declarations.utils.isSuspend
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
@@ -189,6 +191,7 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
         }
     }
 
+    @OptIn(SymbolInternals::class)
     override fun generateFunctions(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirNamedFunctionSymbol> {
         return if (owner == null) {
             topLevelGeneratedCallableIdsAndOriginals[callableId]
@@ -200,14 +203,13 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                     it.name.toAsync()
                 ) == callableId
             }
-        }?.let { original ->
+        }?.takeIf { it.isSuspend }?.let { original ->
             listOf(
                 buildSimpleFunction {
                     name = callableId.callableName
                     symbol = FirNamedFunctionSymbol(callableId)
                     generateRestDeclarationExceptBody(original)
                 }.apply {
-                    symbol.bind(this)
                     replaceBody(generateBody(original, owner))
                 }.symbol
             )
@@ -254,7 +256,6 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                         }
                         variance = Variance.INVARIANT
                     }
-                    // replace on executor. Creates Executors.newFixedThreadPool(10)
                     val receiver = buildPropertyAccessExpression {
                         typeRef = buildResolvedTypeRef {
                             type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
@@ -294,7 +295,6 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                                             type = Names.FUNCTION0_CLASS_ID.toConeClassType(arrayOf(retTypeRef))
                                         }
                                     }.also { anonFunc1 ->
-                                        anonFunc1.symbol.bind(anonFunc1)
                                         anonFunc1.replaceBody(buildSingleExpressionBlock(
                                             statement = buildReturnExpression {
                                                 target = FirFunctionTarget(
@@ -346,7 +346,6 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                                                                                 ), attributes = ConeAttributes.WithExtensionFunctionType)
                                                                         }
                                                                     }.also { anonFunc2 ->
-                                                                        anonFunc2.symbol.bind(anonFunc2)
                                                                         anonFunc2.replaceBody(buildSingleExpressionBlock(
                                                                             statement = buildReturnExpression {
                                                                                 target = FirFunctionTarget(
@@ -368,8 +367,19 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                                                                                             isImplicit = true
                                                                                         }
                                                                                     } ?: FirNoReceiverExpression
-                                                                                    // todo: add real mapping
-                                                                                    argumentList = buildResolvedArgumentList(LinkedHashMap())
+                                                                                    argumentList = buildResolvedArgumentList(LinkedHashMap(
+                                                                                        mapOf(
+                                                                                            *this@generateBody.valueParameters.map { param ->
+                                                                                                buildPropertyAccessExpression {
+                                                                                                    typeRef = param.returnTypeRef
+                                                                                                    calleeReference = buildResolvedNamedReference {
+                                                                                                        name = param.name
+                                                                                                        resolvedSymbol = param.symbol
+                                                                                                    }
+                                                                                                } to original.fir.valueParameters.find { it.name == param.name}!!
+                                                                                            }.toTypedArray()
+                                                                                        )
+                                                                                    ))
                                                                                     calleeReference =
                                                                                         buildResolvedNamedReference {
                                                                                             name = original.name

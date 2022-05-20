@@ -1,28 +1,113 @@
 FILE fqName:foo.bar fileName:/simple.kt
+  FUN name:checkThatGreaterThan42 visibility:public modality:FINAL <> (x:kotlin.Int) returnType:kotlin.Boolean [suspend]
+    annotations:
+      DeSuspend
+    VALUE_PARAMETER name:x index:0 type:kotlin.Int
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='public final fun checkThatGreaterThan42 (x: kotlin.Int): kotlin.Boolean [suspend] declared in foo.bar'
+        CALL 'public final fun greater (arg0: kotlin.Int, arg1: kotlin.Int): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=GT
+          arg0: GET_VAR 'x: kotlin.Int declared in foo.bar.checkThatGreaterThan42' type=kotlin.Int origin=null
+          arg1: CONST Int type=kotlin.Int value=42
+  FUN name:execFoo visibility:public modality:FINAL <> (obj:foo.bar.SimpleClass) returnType:kotlin.Unit [suspend]
+    annotations:
+      DeSuspend
+    VALUE_PARAMETER name:obj index:0 type:foo.bar.SimpleClass
+    BLOCK_BODY
+      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+        CALL 'public final fun foo (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass' type=kotlin.String origin=null
+          $this: GET_VAR 'obj: foo.bar.SimpleClass declared in foo.bar.execFoo' type=foo.bar.SimpleClass origin=null
+          y: CONST String type=kotlin.String value=""
   CLASS CLASS name:SimpleClass modality:FINAL visibility:public superTypes:[kotlin.Any]
     $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.SimpleClass
     CONSTRUCTOR visibility:public <> () returnType:foo.bar.SimpleClass [primary]
       BLOCK_BODY
         DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
         INSTANCE_INITIALIZER_CALL classDescriptor='CLASS CLASS name:SimpleClass modality:FINAL visibility:public superTypes:[kotlin.Any]'
-    FUN name:topLevelSuspend visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass, x:kotlin.Double) returnType:kotlin.String [suspend]
+    FUN name:foo visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass, x:kotlin.Double, unused:kotlin.Int, y:kotlin.String) returnType:kotlin.String [suspend]
       annotations:
         DeSuspend
       $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleClass
       VALUE_PARAMETER name:x index:0 type:kotlin.Double
         EXPRESSION_BODY
           CONST Double type=kotlin.Double value=0.42
+      VALUE_PARAMETER name:unused index:1 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=42
+      VALUE_PARAMETER name:y index:2 type:kotlin.String
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun topLevelSuspend (x: kotlin.Double): kotlin.String [suspend] declared in foo.bar.SimpleClass'
-          CALL 'public open fun toString (): kotlin.String [fake_override] declared in kotlin.Double' type=kotlin.String origin=null
-            $this: GET_VAR 'x: kotlin.Double declared in foo.bar.SimpleClass.topLevelSuspend' type=kotlin.Double origin=null
-    FUN GENERATED[DeSuspender] name:topLevelSuspendAsync visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass, x:kotlin.Double) returnType:java.util.concurrent.Future<kotlin.String>
+        RETURN type=kotlin.Nothing from='public final fun foo (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass'
+          STRING_CONCATENATION type=kotlin.String
+            GET_VAR 'y: kotlin.String declared in foo.bar.SimpleClass.foo' type=kotlin.String origin=null
+            CONST String type=kotlin.String value=" is "
+            GET_VAR 'x: kotlin.Double declared in foo.bar.SimpleClass.foo' type=kotlin.Double origin=null
+    CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]
+      $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.SimpleClass.Companion
+      CONSTRUCTOR visibility:private <> () returnType:foo.bar.SimpleClass.Companion [primary]
+        BLOCK_BODY
+          DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+          INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]'
+      FUN name:fooStatic visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass.Companion, message:kotlin.String) returnType:kotlin.String [suspend]
+        annotations:
+          DeSuspend
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleClass.Companion
+        VALUE_PARAMETER name:message index:0 type:kotlin.String
+          EXPRESSION_BODY
+            CONST String type=kotlin.String value="world"
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun fooStatic (message: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass.Companion'
+            STRING_CONCATENATION type=kotlin.String
+              CONST String type=kotlin.String value="Hello, "
+              GET_VAR 'message: kotlin.String declared in foo.bar.SimpleClass.Companion.fooStatic' type=kotlin.String origin=null
+              CONST String type=kotlin.String value="!"
+      FUN GENERATED[DeSuspender] name:fooStaticAsync visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass.Companion, message:kotlin.String) returnType:java.util.concurrent.Future<kotlin.String>
+        $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleClass.Companion
+        VALUE_PARAMETER name:message index:0 type:kotlin.String
+          EXPRESSION_BODY
+            CONST String type=kotlin.String value="world"
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public final fun fooStaticAsync (message: kotlin.String): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass.Companion'
+            CALL 'public abstract fun submit <T> (p0: @[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>?): @[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>? declared in java.util.concurrent.ExecutorService' type=@[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] kotlin.String?>? origin=null
+              <T>: @[FlexibleNullability] kotlin.String?
+              $this: CALL 'public final fun <get-internal_executor> (): @[FlexibleNullability] java.util.concurrent.ExecutorService? declared in ru.itmo.kotlin.plugin.desuspender' type=@[FlexibleNullability] java.util.concurrent.ExecutorService? origin=GET_PROPERTY
+              p0: TYPE_OP type=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.String?>? origin=SAM_CONVERSION typeOperand=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.String?>?
+                FUN_EXPR type=kotlin.Function0<@[FlexibleNullability] kotlin.String?> origin=LAMBDA
+                  FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:@[FlexibleNullability] kotlin.String?
+                    BLOCK_BODY
+                      RETURN type=kotlin.Nothing from='local final fun <anonymous> (): @[FlexibleNullability] kotlin.String? declared in foo.bar.SimpleClass.Companion.fooStaticAsync'
+                        CALL 'public final fun runBlocking <T> (context: kotlin.coroutines.CoroutineContext, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, T of kotlinx.coroutines.BuildersKt.runBlocking>): T of kotlinx.coroutines.BuildersKt.runBlocking declared in kotlinx.coroutines.BuildersKt' type=kotlin.String origin=null
+                          <T>: kotlin.String
+                          block: FUN_EXPR type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.String> origin=LAMBDA
+                            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($receiver:kotlinx.coroutines.CoroutineScope) returnType:kotlin.String [suspend]
+                              $receiver: VALUE_PARAMETER name:$this$runBlocking type:kotlinx.coroutines.CoroutineScope
+                              BLOCK_BODY
+                                RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.String [suspend] declared in foo.bar.SimpleClass.Companion.fooStaticAsync.<anonymous>'
+                                  CALL 'public final fun fooStatic (message: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass.Companion' type=kotlin.String origin=null
+                                    $this: GET_VAR '<this>: foo.bar.SimpleClass.Companion declared in foo.bar.SimpleClass.Companion.fooStaticAsync' type=foo.bar.SimpleClass.Companion origin=null
+                                    message: GET_VAR 'message: kotlin.String declared in foo.bar.SimpleClass.Companion.fooStaticAsync' type=kotlin.String origin=null
+      FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+        overridden:
+          public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+        VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+      FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+        overridden:
+          public open fun hashCode (): kotlin.Int declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+        overridden:
+          public open fun toString (): kotlin.String declared in kotlin.Any
+        $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN GENERATED[DeSuspender] name:fooAsync visibility:public modality:FINAL <> ($this:foo.bar.SimpleClass, x:kotlin.Double, unused:kotlin.Int, y:kotlin.String) returnType:java.util.concurrent.Future<kotlin.String>
       $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleClass
       VALUE_PARAMETER name:x index:0 type:kotlin.Double
         EXPRESSION_BODY
           CONST Double type=kotlin.Double value=0.42
+      VALUE_PARAMETER name:unused index:1 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=42
+      VALUE_PARAMETER name:y index:2 type:kotlin.String
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='public final fun topLevelSuspendAsync (x: kotlin.Double): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass'
+        RETURN type=kotlin.Nothing from='public final fun fooAsync (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass'
           CALL 'public abstract fun submit <T> (p0: @[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>?): @[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>? declared in java.util.concurrent.ExecutorService' type=@[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] kotlin.String?>? origin=null
             <T>: @[FlexibleNullability] kotlin.String?
             $this: CALL 'public final fun <get-internal_executor> (): @[FlexibleNullability] java.util.concurrent.ExecutorService? declared in ru.itmo.kotlin.plugin.desuspender' type=@[FlexibleNullability] java.util.concurrent.ExecutorService? origin=GET_PROPERTY
@@ -30,16 +115,113 @@ FILE fqName:foo.bar fileName:/simple.kt
               FUN_EXPR type=kotlin.Function0<@[FlexibleNullability] kotlin.String?> origin=LAMBDA
                 FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:@[FlexibleNullability] kotlin.String?
                   BLOCK_BODY
-                    RETURN type=kotlin.Nothing from='local final fun <anonymous> (): @[FlexibleNullability] kotlin.String? declared in foo.bar.SimpleClass.topLevelSuspendAsync'
+                    RETURN type=kotlin.Nothing from='local final fun <anonymous> (): @[FlexibleNullability] kotlin.String? declared in foo.bar.SimpleClass.fooAsync'
                       CALL 'public final fun runBlocking <T> (context: kotlin.coroutines.CoroutineContext, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, T of kotlinx.coroutines.BuildersKt.runBlocking>): T of kotlinx.coroutines.BuildersKt.runBlocking declared in kotlinx.coroutines.BuildersKt' type=kotlin.String origin=null
                         <T>: kotlin.String
                         block: FUN_EXPR type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.String> origin=LAMBDA
                           FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($receiver:kotlinx.coroutines.CoroutineScope) returnType:kotlin.String [suspend]
                             $receiver: VALUE_PARAMETER name:$this$runBlocking type:kotlinx.coroutines.CoroutineScope
                             BLOCK_BODY
-                              RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.String [suspend] declared in foo.bar.SimpleClass.topLevelSuspendAsync.<anonymous>'
-                                CALL 'public final fun topLevelSuspend (x: kotlin.Double): kotlin.String [suspend] declared in foo.bar.SimpleClass' type=kotlin.String origin=null
-                                  $this: GET_VAR '<this>: foo.bar.SimpleClass declared in foo.bar.SimpleClass.topLevelSuspendAsync' type=foo.bar.SimpleClass origin=null
+                              RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.String [suspend] declared in foo.bar.SimpleClass.fooAsync.<anonymous>'
+                                CALL 'public final fun foo (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass' type=kotlin.String origin=null
+                                  $this: GET_VAR '<this>: foo.bar.SimpleClass declared in foo.bar.SimpleClass.fooAsync' type=foo.bar.SimpleClass origin=null
+                                  x: GET_VAR 'x: kotlin.Double declared in foo.bar.SimpleClass.fooAsync' type=kotlin.Double origin=null
+                                  unused: GET_VAR 'unused: kotlin.Int declared in foo.bar.SimpleClass.fooAsync' type=kotlin.Int origin=null
+                                  y: GET_VAR 'y: kotlin.String declared in foo.bar.SimpleClass.fooAsync' type=kotlin.String origin=null
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String declared in kotlin.Any
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  CLASS OBJECT name:SimpleObject modality:FINAL visibility:public superTypes:[kotlin.Any]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:foo.bar.SimpleObject
+    CONSTRUCTOR visibility:private <> () returnType:foo.bar.SimpleObject [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:SimpleObject modality:FINAL visibility:public superTypes:[kotlin.Any]'
+    FUN name:bar visibility:public modality:FINAL <> ($this:foo.bar.SimpleObject, start:kotlin.Int, step:kotlin.Int, count:kotlin.Int) returnType:kotlin.Int [suspend]
+      annotations:
+        DeSuspend
+      $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleObject
+      VALUE_PARAMETER name:start index:0 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=0
+      VALUE_PARAMETER name:step index:1 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=1
+      VALUE_PARAMETER name:count index:2 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=10
+      BLOCK_BODY
+        VAR name:result type:kotlin.Int [var]
+          CONST Int type=kotlin.Int value=0
+        BLOCK type=kotlin.Unit origin=FOR_LOOP
+          VAR FOR_LOOP_ITERATOR name:tmp_0 type:kotlin.collections.IntIterator [val]
+            CALL 'public open fun iterator (): kotlin.collections.IntIterator [operator] declared in kotlin.ranges.IntProgression' type=kotlin.collections.IntIterator origin=FOR_LOOP_ITERATOR
+              $this: CALL 'public final fun step (step: kotlin.Int): kotlin.ranges.IntProgression [infix] declared in kotlin.ranges.RangesKt' type=kotlin.ranges.IntProgression origin=null
+                $receiver: CALL 'public final fun until (to: kotlin.Int): kotlin.ranges.IntRange [infix] declared in kotlin.ranges.RangesKt' type=kotlin.ranges.IntRange origin=null
+                  $receiver: GET_VAR 'start: kotlin.Int declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+                  to: CALL 'public final fun plus (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=PLUS
+                    $this: CALL 'public final fun times (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=MUL
+                      $this: GET_VAR 'count: kotlin.Int declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+                      other: GET_VAR 'step: kotlin.Int declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+                    other: GET_VAR 'start: kotlin.Int declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+                step: GET_VAR 'step: kotlin.Int declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+          WHILE label=null origin=FOR_LOOP_INNER_WHILE
+            condition: CALL 'public abstract fun hasNext (): kotlin.Boolean [fake_override,operator] declared in kotlin.collections.IntIterator' type=kotlin.Boolean origin=FOR_LOOP_HAS_NEXT
+              $this: GET_VAR 'val tmp_0: kotlin.collections.IntIterator [val] declared in foo.bar.SimpleObject.bar' type=kotlin.collections.IntIterator origin=null
+            body: BLOCK type=kotlin.Unit origin=FOR_LOOP_INNER_WHILE
+              VAR FOR_LOOP_VARIABLE name:i type:kotlin.Int [val]
+                CALL 'public final fun next (): kotlin.Int [operator] declared in kotlin.collections.IntIterator' type=kotlin.Int origin=FOR_LOOP_NEXT
+                  $this: GET_VAR 'val tmp_0: kotlin.collections.IntIterator [val] declared in foo.bar.SimpleObject.bar' type=kotlin.collections.IntIterator origin=null
+              BLOCK type=kotlin.Unit origin=null
+                SET_VAR 'var result: kotlin.Int [var] declared in foo.bar.SimpleObject.bar' type=kotlin.Unit origin=PLUSEQ
+                  CALL 'public final fun plus (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=null
+                    $this: GET_VAR 'var result: kotlin.Int [var] declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+                    other: GET_VAR 'val i: kotlin.Int [val] declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+        RETURN type=kotlin.Nothing from='public final fun bar (start: kotlin.Int, step: kotlin.Int, count: kotlin.Int): kotlin.Int [suspend] declared in foo.bar.SimpleObject'
+          GET_VAR 'var result: kotlin.Int [var] declared in foo.bar.SimpleObject.bar' type=kotlin.Int origin=null
+    FUN GENERATED[DeSuspender] name:barAsync visibility:public modality:FINAL <> ($this:foo.bar.SimpleObject, start:kotlin.Int, step:kotlin.Int, count:kotlin.Int) returnType:java.util.concurrent.Future<kotlin.Int>
+      $this: VALUE_PARAMETER name:<this> type:foo.bar.SimpleObject
+      VALUE_PARAMETER name:start index:0 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=0
+      VALUE_PARAMETER name:step index:1 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=1
+      VALUE_PARAMETER name:count index:2 type:kotlin.Int
+        EXPRESSION_BODY
+          CONST Int type=kotlin.Int value=10
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='public final fun barAsync (start: kotlin.Int, step: kotlin.Int, count: kotlin.Int): java.util.concurrent.Future<kotlin.Int> declared in foo.bar.SimpleObject'
+          CALL 'public abstract fun submit <T> (p0: @[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>?): @[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>? declared in java.util.concurrent.ExecutorService' type=@[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] kotlin.Int?>? origin=null
+            <T>: @[FlexibleNullability] kotlin.Int?
+            $this: CALL 'public final fun <get-internal_executor> (): @[FlexibleNullability] java.util.concurrent.ExecutorService? declared in ru.itmo.kotlin.plugin.desuspender' type=@[FlexibleNullability] java.util.concurrent.ExecutorService? origin=GET_PROPERTY
+            p0: TYPE_OP type=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.Int?>? origin=SAM_CONVERSION typeOperand=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.Int?>?
+              FUN_EXPR type=kotlin.Function0<@[FlexibleNullability] kotlin.Int?> origin=LAMBDA
+                FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:@[FlexibleNullability] kotlin.Int?
+                  BLOCK_BODY
+                    RETURN type=kotlin.Nothing from='local final fun <anonymous> (): @[FlexibleNullability] kotlin.Int? declared in foo.bar.SimpleObject.barAsync'
+                      CALL 'public final fun runBlocking <T> (context: kotlin.coroutines.CoroutineContext, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, T of kotlinx.coroutines.BuildersKt.runBlocking>): T of kotlinx.coroutines.BuildersKt.runBlocking declared in kotlinx.coroutines.BuildersKt' type=kotlin.Int origin=null
+                        <T>: kotlin.Int
+                        block: FUN_EXPR type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.Int> origin=LAMBDA
+                          FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($receiver:kotlinx.coroutines.CoroutineScope) returnType:kotlin.Int [suspend]
+                            $receiver: VALUE_PARAMETER name:$this$runBlocking type:kotlinx.coroutines.CoroutineScope
+                            BLOCK_BODY
+                              RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.Int [suspend] declared in foo.bar.SimpleObject.barAsync.<anonymous>'
+                                CALL 'public final fun bar (start: kotlin.Int, step: kotlin.Int, count: kotlin.Int): kotlin.Int [suspend] declared in foo.bar.SimpleObject' type=kotlin.Int origin=null
+                                  $this: GET_VAR '<this>: foo.bar.SimpleObject declared in foo.bar.SimpleObject.barAsync' type=foo.bar.SimpleObject origin=null
+                                  start: GET_VAR 'start: kotlin.Int declared in foo.bar.SimpleObject.barAsync' type=kotlin.Int origin=null
+                                  step: GET_VAR 'step: kotlin.Int declared in foo.bar.SimpleObject.barAsync' type=kotlin.Int origin=null
+                                  count: GET_VAR 'count: kotlin.Int declared in foo.bar.SimpleObject.barAsync' type=kotlin.Int origin=null
     FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
       overridden:
         public open fun equals (other: kotlin.Any?): kotlin.Boolean [operator] declared in kotlin.Any
@@ -55,9 +237,67 @@ FILE fqName:foo.bar fileName:/simple.kt
       $this: VALUE_PARAMETER name:<this> type:kotlin.Any
   FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
     BLOCK_BODY
-      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
-        CALL 'public final fun topLevelSuspendAsync (x: kotlin.Double): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass' type=java.util.concurrent.Future<kotlin.String> origin=null
-          $this: CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in foo.bar.SimpleClass' type=foo.bar.SimpleClass origin=null
-          x: CONST Double type=kotlin.Double value=0.5
+      VAR name:simpleClass type:foo.bar.SimpleClass [val]
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in foo.bar.SimpleClass' type=foo.bar.SimpleClass origin=null
+      VAR name:results type:kotlin.collections.List<kotlin.Boolean> [val]
+        CALL 'public final fun runBlocking <T> (context: kotlin.coroutines.CoroutineContext, block: @[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, T of kotlinx.coroutines.BuildersKt.runBlocking>): T of kotlinx.coroutines.BuildersKt.runBlocking declared in kotlinx.coroutines.BuildersKt' type=kotlin.collections.List<kotlin.Boolean> origin=null
+          <T>: kotlin.collections.List<kotlin.Boolean>
+          block: FUN_EXPR type=@[ExtensionFunctionType] kotlin.coroutines.SuspendFunction1<kotlinx.coroutines.CoroutineScope, kotlin.collections.List<kotlin.Boolean>> origin=LAMBDA
+            FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($receiver:kotlinx.coroutines.CoroutineScope) returnType:kotlin.collections.List<kotlin.Boolean> [suspend]
+              $receiver: VALUE_PARAMETER name:$this$runBlocking type:kotlinx.coroutines.CoroutineScope
+              BLOCK_BODY
+                RETURN type=kotlin.Nothing from='local final fun <anonymous> (): kotlin.collections.List<kotlin.Boolean> [suspend] declared in foo.bar.box'
+                  CALL 'public final fun listOf <T> (vararg elements: T of kotlin.collections.CollectionsKt.listOf): kotlin.collections.List<T of kotlin.collections.CollectionsKt.listOf> declared in kotlin.collections.CollectionsKt' type=kotlin.collections.List<kotlin.Boolean> origin=null
+                    <T>: kotlin.Boolean
+                    elements: VARARG type=kotlin.Array<out kotlin.Boolean> varargElementType=kotlin.Boolean
+                      CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: CALL 'public final fun checkThatGreaterThan42 (x: kotlin.Int): kotlin.Boolean [suspend] declared in foo.bar' type=kotlin.Boolean origin=null
+                          x: CONST Int type=kotlin.Int value=43
+                        arg1: CALL 'public abstract fun get (): @[FlexibleNullability] V of java.util.concurrent.Future? [operator] declared in java.util.concurrent.Future' type=@[FlexibleNullability] kotlin.Boolean? origin=null
+                          $this: CALL 'public final fun checkThatGreaterThan42Async (x: kotlin.Int): java.util.concurrent.Future<kotlin.Boolean> declared in foo.bar' type=java.util.concurrent.Future<kotlin.Boolean> origin=null
+                            x: CONST Int type=kotlin.Int value=43
+                      CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: CALL 'public final fun foo (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass' type=kotlin.String origin=null
+                          $this: GET_VAR 'val simpleClass: foo.bar.SimpleClass [val] declared in foo.bar.box' type=foo.bar.SimpleClass origin=null
+                          x: CONST Double type=kotlin.Double value=0.5
+                          y: CONST String type=kotlin.String value="good"
+                        arg1: CALL 'public abstract fun get (): @[FlexibleNullability] V of java.util.concurrent.Future? [operator] declared in java.util.concurrent.Future' type=@[FlexibleNullability] kotlin.String? origin=null
+                          $this: CALL 'public final fun fooAsync (x: kotlin.Double, unused: kotlin.Int, y: kotlin.String): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass' type=java.util.concurrent.Future<kotlin.String> origin=null
+                            $this: GET_VAR 'val simpleClass: foo.bar.SimpleClass [val] declared in foo.bar.box' type=foo.bar.SimpleClass origin=null
+                            x: CONST Double type=kotlin.Double value=0.5
+                            y: CONST String type=kotlin.String value="good"
+                      CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: CALL 'public final fun fooStatic (message: kotlin.String): kotlin.String [suspend] declared in foo.bar.SimpleClass.Companion' type=kotlin.String origin=null
+                          $this: GET_OBJECT 'CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=foo.bar.SimpleClass.Companion
+                          message: CONST String type=kotlin.String value="world"
+                        arg1: CALL 'public abstract fun get (): @[FlexibleNullability] V of java.util.concurrent.Future? [operator] declared in java.util.concurrent.Future' type=@[FlexibleNullability] kotlin.String? origin=null
+                          $this: CALL 'public final fun fooStaticAsync (message: kotlin.String): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass.Companion' type=java.util.concurrent.Future<kotlin.String> origin=null
+                            $this: GET_OBJECT 'CLASS OBJECT name:Companion modality:FINAL visibility:public [companion] superTypes:[kotlin.Any]' type=foo.bar.SimpleClass.Companion
+                      CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
+                        arg0: CALL 'public final fun bar (start: kotlin.Int, step: kotlin.Int, count: kotlin.Int): kotlin.Int [suspend] declared in foo.bar.SimpleObject' type=kotlin.Int origin=null
+                          $this: GET_OBJECT 'CLASS OBJECT name:SimpleObject modality:FINAL visibility:public superTypes:[kotlin.Any]' type=foo.bar.SimpleObject
+                          start: CONST Int type=kotlin.Int value=10
+                          step: CONST Int type=kotlin.Int value=5
+                          count: CONST Int type=kotlin.Int value=10
+                        arg1: CALL 'public abstract fun get (): @[FlexibleNullability] V of java.util.concurrent.Future? [operator] declared in java.util.concurrent.Future' type=@[FlexibleNullability] kotlin.Int? origin=null
+                          $this: CALL 'public final fun barAsync (start: kotlin.Int, step: kotlin.Int, count: kotlin.Int): java.util.concurrent.Future<kotlin.Int> declared in foo.bar.SimpleObject' type=java.util.concurrent.Future<kotlin.Int> origin=null
+                            $this: GET_OBJECT 'CLASS OBJECT name:SimpleObject modality:FINAL visibility:public superTypes:[kotlin.Any]' type=foo.bar.SimpleObject
+                            start: CONST Int type=kotlin.Int value=10
+                            step: CONST Int type=kotlin.Int value=5
+                            count: CONST Int type=kotlin.Int value=10
       RETURN type=kotlin.Nothing from='public final fun box (): kotlin.String declared in foo.bar'
-        CONST String type=kotlin.String value="OK"
+        WHEN type=kotlin.String origin=IF
+          BRANCH
+            if: CALL 'public final fun all <T> (predicate: kotlin.Function1<T of kotlin.collections.CollectionsKt.all, kotlin.Boolean>): kotlin.Boolean [inline] declared in kotlin.collections.CollectionsKt' type=kotlin.Boolean origin=null
+              <T>: kotlin.Boolean
+              $receiver: GET_VAR 'val results: kotlin.collections.List<kotlin.Boolean> [val] declared in foo.bar.box' type=kotlin.collections.List<kotlin.Boolean> origin=null
+              predicate: FUN_EXPR type=kotlin.Function1<kotlin.Boolean, kotlin.Boolean> origin=LAMBDA
+                FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (it:kotlin.Boolean) returnType:kotlin.Boolean
+                  VALUE_PARAMETER name:it index:0 type:kotlin.Boolean
+                  BLOCK_BODY
+                    RETURN type=kotlin.Nothing from='local final fun <anonymous> (it: kotlin.Boolean): kotlin.Boolean declared in foo.bar.box'
+                      GET_VAR 'it: kotlin.Boolean declared in foo.bar.box.<anonymous>' type=kotlin.Boolean origin=null
+            then: CONST String type=kotlin.String value="OK"
+          BRANCH
+            if: CONST Boolean type=kotlin.Boolean value=true
+            then: CONST String type=kotlin.String value="error: some values are not equals"
