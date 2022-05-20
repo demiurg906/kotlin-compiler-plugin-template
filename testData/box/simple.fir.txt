@@ -1,24 +1,27 @@
 FILE: simple.kt
     package foo.bar
 
-    public final fun box(): R|kotlin/String| {
-        lval result: R|kotlin/String| = R|foo/bar/MyClass|().R|foo/bar/MyClass.foo|()
-        ^box when () {
-            ==(R|<local>/result|, String(Hello world)) ->  {
-                String(OK)
+    public final class SimpleClass : R|kotlin/Any| {
+        public constructor(): R|foo/bar/SimpleClass| {
+            super<R|kotlin/Any|>()
+        }
+
+        @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final suspend fun topLevelSuspend(x: R|kotlin/Double| = Double(0.42)): R|kotlin/String| {
+            ^topLevelSuspend R|<local>/x|.R|kotlin/Any.toString|()
+        }
+
+        public final fun topLevelSuspendAsync(x: R|kotlin/Double| = Double(0.42)): R|java/util/concurrent/Future<kotlin/String>| {
+            ^topLevelSuspendAsync Q|java/util/concurrent/Executors|.R|java/util/concurrent/Executors.newFixedThreadPool|(Int(10)).R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
+                ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/String|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/String| <inline=NoInline, kind=EXACTLY_ONCE>  {
+                    ^ this@R|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.topLevelSuspend|()
+                }
+                )
             }
-            else ->  {
-                <strcat>(String(Fail: ), R|<local>/result|)
-            }
+            )
         }
 
     }
-FILE: __GENERATED DECLARATIONS__.kt
-    package foo.bar
-
-    public final class MyClass : R|kotlin/Any| {
-        public final fun foo(): R|kotlin/String|
-
-        public constructor(): R|foo/bar/MyClass|
-
+    public final fun box(): R|kotlin/String| {
+        R|foo/bar/SimpleClass.SimpleClass|().R|foo/bar/SimpleClass.topLevelSuspendAsync|(Double(0.5))
+        ^box String(OK)
     }

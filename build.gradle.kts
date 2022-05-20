@@ -31,6 +31,11 @@ dependencies {
         testImplementation(it)
     }
 
+    "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1".let {
+        implementation(it)
+        testImplementation(it)
+    }
+
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-annotations-jvm:$kotlinVersion")
