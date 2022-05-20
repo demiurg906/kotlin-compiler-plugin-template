@@ -12,13 +12,17 @@ import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirFunctionTarget
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
+import org.jetbrains.kotlin.fir.analysis.checkers.unsubstitutedScope
 import org.jetbrains.kotlin.fir.builder.buildLabel
 import org.jetbrains.kotlin.fir.containingClass
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.builder.*
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyBackingField
+import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibility
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
@@ -38,6 +42,7 @@ import org.jetbrains.kotlin.fir.resolve.SessionHolder
 import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
 import org.jetbrains.kotlin.fir.resolve.scopeSessionKey
 import org.jetbrains.kotlin.fir.scopes.getFunctions
+import org.jetbrains.kotlin.fir.scopes.unsubstitutedScope
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
@@ -56,6 +61,7 @@ import org.jetbrains.kotlin.psi.stubs.KotlinFunctionStub
 import org.jetbrains.kotlin.psi.stubs.impl.KotlinFunctionStubImpl
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.types.Variance
+import ru.itmo.kotlin.plugin.fir.Names.ASYNC_EXECUTOR_FQN
 import ru.itmo.kotlin.plugin.fir.Names.toAsync
 
 
@@ -93,8 +99,94 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
     override fun getTopLevelCallableIds(): Set<CallableId> {
         return topLevelAnnotatedFunctions.mapTo(HashSet()) {
             CallableId(it.callableId.packageName, it.callableId.callableName.toAsync())
+        } + Names.ASYNC_EXECUTOR_CALLABLE_ID
+    }
+
+    override fun generateProperties(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirPropertySymbol> {
+        return if (callableId == Names.ASYNC_EXECUTOR_CALLABLE_ID) {
+            val retTypeRef = buildResolvedTypeRef {
+                type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
+            }
+            val propSymbol = FirPropertySymbol(callableId)
+            listOf(
+                buildProperty {
+                    moduleData = session.moduleData
+                    resolvePhase = FirResolvePhase.BODY_RESOLVE
+                    origin = Key.origin
+                    status = FirResolvedDeclarationStatusImpl.DEFAULT_STATUS_FOR_STATUSLESS_DECLARATIONS
+                    returnTypeRef = retTypeRef
+                    name = callableId.callableName
+                    initializer = generateExecutorService()
+                    isVar = false
+                    getter = FirDefaultPropertyGetter(
+                        source = null,
+                        moduleData = session.moduleData,
+                        origin = Key.origin,
+                        propertyTypeRef = retTypeRef,
+                        visibility = Visibilities.Public,
+                        propertySymbol = propSymbol,
+                        effectiveVisibility = EffectiveVisibility.Public,
+
+                    )
+                    backingField = FirDefaultPropertyBackingField(
+                        moduleData = session.moduleData,
+                        annotations = mutableListOf(),
+                        returnTypeRef = retTypeRef,
+                        isVar = false,
+                        propertySymbol = propSymbol,
+                        status = FirResolvedDeclarationStatusImpl(
+                            Visibilities.Private,
+                            Modality.FINAL,
+                            EffectiveVisibility.PrivateInClass)
+                    )
+                    symbol = propSymbol
+                    isLocal = false
+                    bodyResolveState = FirPropertyBodyResolveState.EVERYTHING_RESOLVED
+                }.apply { propSymbol.bind(this) }.symbol
+            )
+        } else emptyList()
+    }
+
+    @OptIn(SymbolInternals::class)
+    private fun generateExecutorService(): FirFunctionCall {
+        val classSymbol = session.symbolProvider.getClassLikeSymbolByClassId(
+            Names.EXECUTORS_CLASS_ID
+        ) as FirRegularClassSymbol
+        val mySession = session
+        val myScopeSession = ScopeSession()
+        val sessionHolder = object : SessionHolder {
+            override val session: FirSession
+                get() = mySession
+            override val scopeSession: ScopeSession
+                get() = myScopeSession
         }
-//        + Names.ASYNC_EXECUTOR_CALLABLE_ID
+        val symbols = classSymbol.fir.staticScope(sessionHolder)?.getFunctions(Name.identifier("newFixedThreadPool"))!!
+
+        return buildFunctionCall {
+            typeRef = buildResolvedTypeRef {
+                type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
+            }
+            explicitReceiver = buildResolvedQualifier {
+                typeRef = session.builtinTypes.unitType
+                packageFqName = Names.CONCURRENT_PKG_FQN
+                relativeClassFqName = FqName("Executors")
+                symbol = Finder.findExecutorsSymbol(session)
+            }
+            val newThreadPoolExecutorSymbol = symbols.find { it.valueParameterSymbols.count() == 1 }!!
+            calleeReference = buildResolvedNamedReference {
+                name = Names.NEW_FIXED_THREAD_POOL_NAME
+                resolvedSymbol = newThreadPoolExecutorSymbol
+            }
+            argumentList = buildResolvedArgumentList(
+                LinkedHashMap(
+                    mapOf(
+                        buildConstExpression(source = null, kind = ConstantValueKind.Int, value = 10).apply {
+                            replaceTypeRef(session.builtinTypes.intType)
+                        } to newThreadPoolExecutorSymbol.fir.valueParameters[0]
+                    )
+                )
+            )
+        }
     }
 
     override fun generateFunctions(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirNamedFunctionSymbol> {
@@ -141,6 +233,12 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
 
     @OptIn(SymbolInternals::class)
     private fun FirSimpleFunction.generateBody(original: FirNamedFunctionSymbol, owner: FirClassSymbol<*>?): FirBlock {
+        val classSymbol = session.symbolProvider.getClassLikeSymbolByClassId(
+            Names.EXECUTOR_SERVICE_CLASS_ID
+        ) as FirRegularClassSymbol
+        val myScopeSession = ScopeSession()
+        val symbols = classSymbol.unsubstitutedScope(session, myScopeSession, false).getFunctions(Names.SUBMIT_NAME)
+
         return buildSingleExpressionBlock(
             statement = buildReturnExpression {
                 target = FirFunctionTarget(original.callableId.callableName.asString(), isLambda = false).apply {
@@ -157,10 +255,18 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                         variance = Variance.INVARIANT
                     }
                     // replace on executor. Creates Executors.newFixedThreadPool(10)
-                    val receiver = generateExecutorService()
+                    val receiver = buildPropertyAccessExpression {
+                        typeRef = buildResolvedTypeRef {
+                            type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
+                        }
+                        calleeReference = buildResolvedNamedReference {
+                            name = Names.ASYNC_EXECUTOR_NAME
+                            resolvedSymbol = session.symbolProvider.getTopLevelCallableSymbols(ASYNC_EXECUTOR_FQN, Names.ASYNC_EXECUTOR_NAME)[0]
+                        }
+                    }
                     explicitReceiver = receiver
                     dispatchReceiver = receiver
-                    val submitSymbol = Finder.findSubmitSymbol(session).wrapJavaMethodSubmit()
+                    val submitSymbol = symbols[0]
                     calleeReference = buildResolvedNamedReference {
                         name = Names.SUBMIT_NAME
                         resolvedSymbol = submitSymbol
@@ -297,145 +403,6 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                     }
                 )
             }
-    }
-
-    @OptIn(SymbolInternals::class)
-    private fun FirNamedFunctionSymbol.wrapJavaMethodSubmit(): FirNamedFunctionSymbol {
-        val oldFir: FirJavaMethod = fir as FirJavaMethod
-        val oldTypeParam = oldFir.typeParameters[0]
-        val oldValParam = oldFir.valueParameters[0]
-        bind(buildSimpleFunction {
-            moduleData = oldFir.moduleData
-            resolvePhase = FirResolvePhase.BODY_RESOLVE
-            origin = FirDeclarationOrigin.Enhancement
-            status = FirResolvedDeclarationStatusImpl(Visibilities.Public, Modality.ABSTRACT, EffectiveVisibility.Public)
-            val typeParam = buildTypeParameter {
-                moduleData = oldTypeParam.moduleData
-                resolvePhase = FirResolvePhase.BODY_RESOLVE
-                origin = FirDeclarationOrigin.Enhancement
-                name = oldTypeParam.name
-                symbol = FirTypeParameterSymbol()
-                containingDeclarationSymbol = FirNamedFunctionSymbol(this@wrapJavaMethodSubmit.callableId).apply {
-                    bind(oldFir)
-                }
-                variance = Variance.INVARIANT
-                isReified = oldTypeParam.isReified
-                bounds += buildResolvedTypeRef {
-                    type = ClassId(FqName("kotlin"), Name.identifier("Any")).toFlexibleConeClassType()
-                }
-            }
-            returnTypeRef = buildResolvedTypeRef {
-                type = Names.FUTURE_CLASS_ID.toFlexibleConeClassType(arrayOf(
-                    ConeFlexibleType(
-                        lowerBound = ConeTypeParameterTypeImpl(lookupTag = typeParam.symbol.toLookupTag(), isNullable = false),
-                        upperBound = ConeTypeParameterTypeImpl(lookupTag = typeParam.symbol.toLookupTag(), isNullable = true)
-                    )
-                ))
-            }
-            dispatchReceiverType = Names.EXECUTOR_SERVICE_CLASS_ID.toConeClassType()
-            valueParameters += buildValueParameter {
-                moduleData = oldValParam.moduleData
-                resolvePhase = FirResolvePhase.BODY_RESOLVE
-                origin = FirDeclarationOrigin.Enhancement
-                returnTypeRef = buildResolvedTypeRef {
-                    type = Names.CALLABLE_CLASS_ID.toFlexibleConeClassType(arrayOf(
-                        ConeFlexibleType(
-                            lowerBound = ConeTypeParameterTypeImpl(lookupTag = typeParam.symbol.toLookupTag(), isNullable = false),
-                            upperBound = ConeTypeParameterTypeImpl(lookupTag = typeParam.symbol.toLookupTag(), isNullable = true)
-                        )
-                    ))
-                }
-                name = oldValParam.name
-                symbol = FirValueParameterSymbol(oldValParam.name)
-                isCrossinline = false
-                isNoinline = false
-                isVararg = false
-            }.apply { symbol.bind(this) }
-            name = Names.SUBMIT_NAME
-            symbol = this@wrapJavaMethodSubmit
-            oldFir.typeParameters.apply { removeLast(); add(typeParam) }
-            typeParameters += typeParam
-        })
-        return this
-    }
-
-    @OptIn(SymbolInternals::class)
-    private fun generateExecutorService(): FirFunctionCall {
-        //  buildPropertyAccessExpression {
-//          calleeReference = buildResolvedNamedReference {
-//              name = Names.ASYNC_EXECUTOR_NAME
-//              resolvedSymbol = FirNamedFunctionSymbol(Names.ASYNC_EXECUTOR_CALLABLE_ID)
-//          }
-//      }
-
-        val classSymbol = session.symbolProvider.getClassLikeSymbolByClassId(
-            Names.EXECUTORS_CLASS_ID
-        ) as FirRegularClassSymbol
-        val mySession = session
-        val myScopeSession = ScopeSession()
-        val sessionHolder = object : SessionHolder {
-            override val session: FirSession
-                get() = mySession
-            override val scopeSession: ScopeSession
-                get() = myScopeSession
-        }
-        val symbols = classSymbol.fir.staticScope(sessionHolder)?.getFunctions(Name.identifier("newFixedThreadPool"))!!
-
-        return buildFunctionCall {
-            typeRef = buildResolvedTypeRef {
-                type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
-            }
-            explicitReceiver = buildResolvedQualifier {
-                typeRef = session.builtinTypes.unitType
-                packageFqName = Names.CONCURRENT_PKG_FQN
-                relativeClassFqName = FqName("Executors")
-                // FirRegularClassSymbol(Names.EXECUTORS_CLASS_ID)
-                symbol = Finder.findExecutorsSymbol(session)
-            }
-            val newThreadPoolExecutorSymbol = symbols.find { it.valueParameterSymbols.count() == 1 }!!
-//                Finder.findFixedThreadPoolSymbol(session).apply {
-//                val oldFir: FirJavaMethod = fir as FirJavaMethod
-//                val oldValueParam = oldFir.valueParameters[0]
-//                bind(buildSimpleFunction {
-//                    moduleData = oldFir.moduleData
-//                    resolvePhase = FirResolvePhase.BODY_RESOLVE
-//                    origin = FirDeclarationOrigin.Enhancement
-//                    // todo:
-//                    attributes = oldFir.attributes
-//                    status =
-//                        FirResolvedDeclarationStatusImpl(Visibilities.Public, Modality.OPEN, EffectiveVisibility.Public)
-//                    returnTypeRef = buildResolvedTypeRef {
-//                        type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
-//                    }
-//                    valueParameters += buildValueParameter {
-//                        moduleData = oldValueParam.moduleData
-//                        resolvePhase = FirResolvePhase.BODY_RESOLVE
-//                        origin = FirDeclarationOrigin.Enhancement
-//                        returnTypeRef = session.builtinTypes.intType
-//                        name = oldValueParam.name
-//                        symbol = FirValueParameterSymbol(oldValueParam.name)
-//                        isCrossinline = false
-//                        isNoinline = false
-//                        isVararg = false
-//                    }.apply { symbol.bind(this) }
-//                    name = Names.NEW_FIXED_THREAD_POOL_NAME
-//                    symbol = this@apply
-//                })
-//            }
-            calleeReference = buildResolvedNamedReference {
-                name = Names.NEW_FIXED_THREAD_POOL_NAME
-                resolvedSymbol = newThreadPoolExecutorSymbol
-            }
-            argumentList = buildResolvedArgumentList(
-                LinkedHashMap(
-                    mapOf(
-                        buildConstExpression(source = null, kind = ConstantValueKind.Int, value = 10).apply {
-                            replaceTypeRef(session.builtinTypes.intType)
-                        } to newThreadPoolExecutorSymbol.fir.valueParameters[0]
-                    )
-                )
-            )
-        }
     }
 
     private fun ClassId.toFlexibleConeClassType(typeArgs: Array<ConeTypeProjection> = emptyArray()): ConeFlexibleType {

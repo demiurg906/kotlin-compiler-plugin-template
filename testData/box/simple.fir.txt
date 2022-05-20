@@ -11,7 +11,7 @@ FILE: simple.kt
         }
 
         public final fun topLevelSuspendAsync(x: R|kotlin/Double| = Double(0.42)): R|java/util/concurrent/Future<kotlin/String>| {
-            ^topLevelSuspendAsync Q|java/util/concurrent/Executors|.R|java/util/concurrent/Executors.newFixedThreadPool|(Int(10)).R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
+            ^topLevelSuspendAsync R|ru/itmo/kotlin/plugin/desuspender/internal_executor|.R|java/util/concurrent/ExecutorService.submit|<R|ft<kotlin/String, kotlin/String?>|>(<L> = submit@fun <anonymous>(): R|ft<kotlin/String, kotlin/String?>| <inline=NoInline>  {
                 ^ R|kotlinx/coroutines/runBlocking|<R|kotlin/String|>(<L> = runBlocking@fun R|kotlinx/coroutines/CoroutineScope|.<anonymous>(): R|kotlin/String| <inline=NoInline, kind=EXACTLY_ONCE>  {
                     ^ this@R|foo/bar/SimpleClass|.R|foo/bar/SimpleClass.topLevelSuspend|()
                 }
@@ -25,3 +25,8 @@ FILE: simple.kt
         R|foo/bar/SimpleClass.SimpleClass|().R|foo/bar/SimpleClass.topLevelSuspendAsync|(Double(0.5))
         ^box String(OK)
     }
+FILE: __GENERATED DECLARATIONS__.kt
+    package ru.itmo.kotlin.plugin.desuspender
+
+    public final val internal_executor: R|ft<java/util/concurrent/ExecutorService, java/util/concurrent/ExecutorService?>| = Q|java/util/concurrent/Executors|.R|java/util/concurrent/Executors.newFixedThreadPool|(Int(10))
+        public get(): R|ft<java/util/concurrent/ExecutorService, java/util/concurrent/ExecutorService?>|

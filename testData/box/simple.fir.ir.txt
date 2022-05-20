@@ -25,8 +25,7 @@ FILE fqName:foo.bar fileName:/simple.kt
         RETURN type=kotlin.Nothing from='public final fun topLevelSuspendAsync (x: kotlin.Double): java.util.concurrent.Future<kotlin.String> declared in foo.bar.SimpleClass'
           CALL 'public abstract fun submit <T> (p0: @[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>?): @[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] T of java.util.concurrent.ExecutorService.submit?>? declared in java.util.concurrent.ExecutorService' type=@[FlexibleNullability] java.util.concurrent.Future<@[FlexibleNullability] kotlin.String?>? origin=null
             <T>: @[FlexibleNullability] kotlin.String?
-            $this: CALL 'public open fun newFixedThreadPool (p0: kotlin.Int): @[FlexibleNullability] java.util.concurrent.ExecutorService? declared in java.util.concurrent.Executors' type=@[FlexibleNullability] java.util.concurrent.ExecutorService? origin=null
-              p0: CONST Int type=kotlin.Int value=10
+            $this: CALL 'public final fun <get-internal_executor> (): @[FlexibleNullability] java.util.concurrent.ExecutorService? declared in ru.itmo.kotlin.plugin.desuspender' type=@[FlexibleNullability] java.util.concurrent.ExecutorService? origin=GET_PROPERTY
             p0: TYPE_OP type=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.String?>? origin=SAM_CONVERSION typeOperand=@[FlexibleNullability] java.util.concurrent.Callable<@[FlexibleNullability] kotlin.String?>?
               FUN_EXPR type=kotlin.Function0<@[FlexibleNullability] kotlin.String?> origin=LAMBDA
                 FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:@[FlexibleNullability] kotlin.String?
