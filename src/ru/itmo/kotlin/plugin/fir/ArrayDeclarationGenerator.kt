@@ -41,13 +41,11 @@ class ArrayDeclarationGenerator(session: FirSession) : FirDeclarationGenerationE
             containingDeclarationSymbol = aliasSymbol
             name = Name.identifier("T")
         }
-        val typeArgument = ConeKotlinTypeConflictingProjection(
-            if (level == 1) {
+        val typeArgument = if (level == 1) {
                 typeParameter.toConeType()
             } else {
                 ClassId(packageName, Name.identifier("$prefix${level - 1}")).toConeType(arrayOf(typeParameter.toConeType()))
             }
-        )
         val alias = buildTypeAlias {
             moduleData = session.moduleData
             origin = Key.origin

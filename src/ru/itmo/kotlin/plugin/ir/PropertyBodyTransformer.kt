@@ -56,7 +56,7 @@ class PropertyBodyTransformer(context: IrPluginContext) : IrElementVisitorVoid {
             is IrDeclaration, is IrFile, is IrModuleFragment -> element.acceptChildrenVoid(this)
             else -> {}
         }
-        if (element is IrFile && singletonLazy.isInitialized()) {
+        if (element is IrFile && singletonLazy.isInitialized() && !isSingletonBound) {
             element.bind(singleton)
             isSingletonBound = true
         }

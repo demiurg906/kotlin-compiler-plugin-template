@@ -4,6 +4,7 @@ import org.itmo.my.pretty.plugin.*
 import org.itmo.my.pretty.plugin.Injectable
 import org.itmo.my.pretty.plugin.Injected
 
+// To check that if the annotation name is not `Injected`, duplicate `name` arguments are not marked as errors
 annotation class OtherAnnotation(val name: String)
 @OtherAnnotation(name = "x")
 class ClassWithoutErrors

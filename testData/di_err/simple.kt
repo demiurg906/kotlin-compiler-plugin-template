@@ -10,5 +10,9 @@ class InjectedImpl
 @Injected(name = "x"<!MULTIPLE_NAME_DEFINITIONS!>)<!>
 class InjectedImpl2
 
+// To check that each diagnostic applies only once
+@Injected(name = "x"<!MULTIPLE_NAME_DEFINITIONS!>)<!>
+class InjectedImpl3
+
 @Injected(name = "y")
-class [<!NO_CONSTRUCTOR!>InjectedImpl3<!>(val data: Int) {}
+class <!NO_CONSTRUCTOR!>InjectedImpl4<!>(val data: Int) {}

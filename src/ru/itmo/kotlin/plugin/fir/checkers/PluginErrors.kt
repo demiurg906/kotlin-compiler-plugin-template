@@ -8,8 +8,6 @@ package ru.itmo.kotlin.plugin.fir.checkers
 import com.intellij.psi.PsiElement
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.error1
-import org.jetbrains.kotlin.diagnostics.error2
-import org.jetbrains.kotlin.diagnostics.warning1
 
 object PluginErrors {
     val NO_CONSTRUCTOR by error1<PsiElement, String>(SourceElementPositioningStrategies.NAME_IDENTIFIER)

@@ -17,11 +17,11 @@ import ru.itmo.kotlin.plugin.fir.checkers.InjectedNameChecker
 class PluginAdditionalCheckers(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
         override val annotationCallCheckers: Set<FirAnnotationCallChecker>
-            get() = setOf(InjectedNameChecker(session))
+            get() = setOf(InjectedNameChecker)
     }
 
     override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
         override val classCheckers: Set<FirClassChecker>
-            get() = setOf(InjectedConstructorChecker(session))
+            get() = setOf(InjectedConstructorChecker)
     }
 }

@@ -13,8 +13,14 @@ FILE: simple.kt
         }
 
     }
-    @R|org/itmo/my/pretty/plugin/Injected|(name = String(y)) public final class InjectedImpl3 : R|kotlin/Any| {
-        public constructor(data: R|kotlin/Int|): R|foo/bar/InjectedImpl3| {
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(x)) public final class InjectedImpl3 : R|kotlin/Any| {
+        public constructor(): R|foo/bar/InjectedImpl3| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    @R|org/itmo/my/pretty/plugin/Injected|(name = String(y)) public final class InjectedImpl4 : R|kotlin/Any| {
+        public constructor(data: R|kotlin/Int|): R|foo/bar/InjectedImpl4| {
             super<R|kotlin/Any|>()
         }
 
@@ -22,3 +28,16 @@ FILE: simple.kt
             public get(): R|kotlin/Int|
 
     }
+FILE: __GENERATED DECLARATIONS__.kt
+    package foo.bar
+
+    public final typealias Array1<T> = R|kotlin/Array<T>|
+    public final typealias Array2<T> = R|kotlin/Array<foo/bar/Array1<T>>|
+    public final typealias Array3<T> = R|kotlin/Array<foo/bar/Array2<T>>|
+    public final typealias Array4<T> = R|kotlin/Array<foo/bar/Array3<T>>|
+    public final typealias Array5<T> = R|kotlin/Array<foo/bar/Array4<T>>|
+    public final typealias Array6<T> = R|kotlin/Array<foo/bar/Array5<T>>|
+    public final typealias Array7<T> = R|kotlin/Array<foo/bar/Array6<T>>|
+    public final typealias Array8<T> = R|kotlin/Array<foo/bar/Array7<T>>|
+    public final typealias Array9<T> = R|kotlin/Array<foo/bar/Array8<T>>|
+    public final typealias Array10<T> = R|kotlin/Array<foo/bar/Array9<T>>|
