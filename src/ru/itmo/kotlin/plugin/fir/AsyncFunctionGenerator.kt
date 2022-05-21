@@ -1,8 +1,6 @@
 package ru.itmo.kotlin.plugin.fir
 
 import com.intellij.psi.impl.source.tree.CompositeElement
-import org.jetbrains.kotlin.KtFakeSourceElement
-import org.jetbrains.kotlin.KtNodeType
 import org.jetbrains.kotlin.KtNodeTypes
 import org.jetbrains.kotlin.KtRealPsiSourceElement
 import org.jetbrains.kotlin.contracts.description.EventOccurrencesRange
@@ -11,60 +9,53 @@ import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirFunctionTarget
 import org.jetbrains.kotlin.fir.FirSession
-import org.jetbrains.kotlin.fir.analysis.checkers.PsiSourceNavigator.getRawName
 import org.jetbrains.kotlin.fir.analysis.checkers.getContainingClassSymbol
-import org.jetbrains.kotlin.fir.analysis.checkers.unsubstitutedScope
 import org.jetbrains.kotlin.fir.builder.buildLabel
 import org.jetbrains.kotlin.fir.containingClass
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.builder.*
+import org.jetbrains.kotlin.fir.declarations.builder.FirSimpleFunctionBuilder
+import org.jetbrains.kotlin.fir.declarations.builder.buildAnonymousFunction
+import org.jetbrains.kotlin.fir.declarations.builder.buildProperty
+import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyBackingField
 import org.jetbrains.kotlin.fir.declarations.impl.FirDefaultPropertyGetter
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
 import org.jetbrains.kotlin.fir.declarations.utils.effectiveVisibility
 import org.jetbrains.kotlin.fir.declarations.utils.isSuspend
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
-import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirBlock
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.buildResolvedArgumentList
 import org.jetbrains.kotlin.fir.expressions.builder.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirNoReceiverExpression
+import org.jetbrains.kotlin.fir.expressions.impl.FirResolvedArgumentList
 import org.jetbrains.kotlin.fir.expressions.impl.buildSingleExpressionBlock
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationPredicateRegistrar
 import org.jetbrains.kotlin.fir.extensions.predicate.has
 import org.jetbrains.kotlin.fir.extensions.predicateBasedProvider
-import org.jetbrains.kotlin.fir.java.declarations.FirJavaMethod
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.references.builder.buildImplicitThisReference
 import org.jetbrains.kotlin.fir.references.builder.buildResolvedNamedReference
-import org.jetbrains.kotlin.fir.resolve.ScopeSession
-import org.jetbrains.kotlin.fir.resolve.SessionHolder
-import org.jetbrains.kotlin.fir.resolve.providers.symbolProvider
-import org.jetbrains.kotlin.fir.resolve.scopeSessionKey
-import org.jetbrains.kotlin.fir.scopes.getFunctions
-import org.jetbrains.kotlin.fir.scopes.unsubstitutedScope
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.*
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.builder.buildTypeProjectionWithVariance
 import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
-import org.jetbrains.kotlin.fir.types.impl.ConeTypeParameterTypeImpl
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtFunctionLiteral
-import org.jetbrains.kotlin.psi.KtNamedFunction
-import org.jetbrains.kotlin.psi.stubs.KotlinFunctionStub
-import org.jetbrains.kotlin.psi.stubs.impl.KotlinFunctionStubImpl
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.types.Variance
-import ru.itmo.kotlin.plugin.fir.Names.ASYNC_EXECUTOR_FQN
-import ru.itmo.kotlin.plugin.fir.Names.toAsync
+import ru.itmo.kotlin.plugin.fir.utils.Finder
+import ru.itmo.kotlin.plugin.fir.utils.Names
+import ru.itmo.kotlin.plugin.fir.utils.Names.COROUTINE_SCOPE_CLASS_ID
+import ru.itmo.kotlin.plugin.fir.utils.Names.NOTHING_CLASS_ID
+import ru.itmo.kotlin.plugin.fir.utils.Names.SUSPEND_FUNCTION_CLASS_ID
+import ru.itmo.kotlin.plugin.fir.utils.Names.toAsync
 
 
 /**
@@ -95,7 +86,7 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
     }
 
     override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>): Set<Name> {
-        return annotatedMethodsByClassSymbol[classSymbol]?.mapTo(HashSet()) { it.name.toAsync() } ?: emptySet()
+        return annotatedMethodsByClassSymbol[classSymbol]?.map { it.name.toAsync() }?.toSet() ?: emptySet()
     }
 
     override fun getTopLevelCallableIds(): Set<CallableId> {
@@ -106,25 +97,23 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
 
     override fun generateProperties(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirPropertySymbol> {
         return if (callableId == Names.ASYNC_EXECUTOR_CALLABLE_ID) {
-            val retTypeRef = buildResolvedTypeRef {
-                type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
-            }
             val propSymbol = FirPropertySymbol(callableId)
+            val propInitializer = createFixedThreadPool()
             listOf(
                 buildProperty {
                     moduleData = session.moduleData
                     resolvePhase = FirResolvePhase.BODY_RESOLVE
                     origin = Key.origin
                     status = FirResolvedDeclarationStatusImpl.DEFAULT_STATUS_FOR_STATUSLESS_DECLARATIONS
-                    returnTypeRef = retTypeRef
+                    returnTypeRef = propInitializer.typeRef
                     name = callableId.callableName
-                    initializer = generateExecutorService()
+                    initializer = propInitializer
                     isVar = false
                     getter = FirDefaultPropertyGetter(
                         source = null,
                         moduleData = session.moduleData,
                         origin = Key.origin,
-                        propertyTypeRef = retTypeRef,
+                        propertyTypeRef = propInitializer.typeRef,
                         visibility = Visibilities.Public,
                         propertySymbol = propSymbol,
                         effectiveVisibility = EffectiveVisibility.Public,
@@ -133,7 +122,7 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                     backingField = FirDefaultPropertyBackingField(
                         moduleData = session.moduleData,
                         annotations = mutableListOf(),
-                        returnTypeRef = retTypeRef,
+                        returnTypeRef = propInitializer.typeRef,
                         isVar = false,
                         propertySymbol = propSymbol,
                         status = FirResolvedDeclarationStatusImpl(
@@ -144,26 +133,13 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                     symbol = propSymbol
                     isLocal = false
                     bodyResolveState = FirPropertyBodyResolveState.EVERYTHING_RESOLVED
-                }.apply { propSymbol.bind(this) }.symbol
+                }.symbol
             )
         } else emptyList()
     }
 
     @OptIn(SymbolInternals::class)
-    private fun generateExecutorService(): FirFunctionCall {
-        val classSymbol = session.symbolProvider.getClassLikeSymbolByClassId(
-            Names.EXECUTORS_CLASS_ID
-        ) as FirRegularClassSymbol
-        val mySession = session
-        val myScopeSession = ScopeSession()
-        val sessionHolder = object : SessionHolder {
-            override val session: FirSession
-                get() = mySession
-            override val scopeSession: ScopeSession
-                get() = myScopeSession
-        }
-        val symbols = classSymbol.fir.staticScope(sessionHolder)?.getFunctions(Name.identifier("newFixedThreadPool"))!!
-
+    private fun createFixedThreadPool(): FirFunctionCall {
         return buildFunctionCall {
             typeRef = buildResolvedTypeRef {
                 type = Names.EXECUTOR_SERVICE_CLASS_ID.toFlexibleConeClassType()
@@ -174,34 +150,28 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                 relativeClassFqName = FqName("Executors")
                 symbol = Finder.findExecutorsSymbol(session)
             }
-            val newThreadPoolExecutorSymbol = symbols.find { it.valueParameterSymbols.count() == 1 }!!
             calleeReference = buildResolvedNamedReference {
                 name = Names.NEW_FIXED_THREAD_POOL_NAME
-                resolvedSymbol = newThreadPoolExecutorSymbol
+                resolvedSymbol = Finder.findFixedThreadPoolSymbol(session)
             }
             argumentList = buildResolvedArgumentList(
                 LinkedHashMap(
                     mapOf(
                         buildConstExpression(source = null, kind = ConstantValueKind.Int, value = 10).apply {
                             replaceTypeRef(session.builtinTypes.intType)
-                        } to newThreadPoolExecutorSymbol.fir.valueParameters[0]
+                        } to Finder.findFixedThreadPoolSymbol(session).fir.valueParameters[0]
                     )
                 )
             )
         }
     }
 
-    @OptIn(SymbolInternals::class)
     override fun generateFunctions(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirNamedFunctionSymbol> {
         return if (owner == null) {
             topLevelGeneratedCallableIdsAndOriginals[callableId]
         } else {
             annotatedMethodsByClassSymbol[owner]?.find {
-                CallableId(
-                    it.callableId.packageName,
-                    it.callableId.className,
-                    it.name.toAsync()
-                ) == callableId
+                CallableId(it.callableId.packageName, it.callableId.className, it.name.toAsync()) == callableId
             }
         }?.takeIf { it.isSuspend }?.let { original ->
             listOf(
@@ -233,27 +203,19 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
         valueParameters += original.fir.valueParameters
     }
 
-    @OptIn(SymbolInternals::class)
     private fun FirSimpleFunction.generateBody(original: FirNamedFunctionSymbol, owner: FirClassSymbol<*>?): FirBlock {
-        val classSymbol = session.symbolProvider.getClassLikeSymbolByClassId(
-            Names.EXECUTOR_SERVICE_CLASS_ID
-        ) as FirRegularClassSymbol
-        val myScopeSession = ScopeSession()
-        val symbols = classSymbol.unsubstitutedScope(session, myScopeSession, false).getFunctions(Names.SUBMIT_NAME)
-
         return buildSingleExpressionBlock(
             statement = buildReturnExpression {
                 target = FirFunctionTarget(original.callableId.callableName.asString(), isLambda = false).apply {
                     bind(this@generateBody)
                 }
                 result = buildFunctionCall {
+                    val typeArg = original.resolvedReturnType.classId!!.toFlexibleConeClassType()
                     typeRef = buildResolvedTypeRef {
-                        type = Names.FUTURE_CLASS_ID.toFlexibleConeClassType(arrayOf(original.resolvedReturnType.classId!!.toFlexibleConeClassType()))
+                        type = Names.FUTURE_CLASS_ID.toFlexibleConeClassType(arrayOf(typeArg))
                     }
                     typeArguments += buildTypeProjectionWithVariance {
-                        typeRef = buildResolvedTypeRef {
-                            type = original.resolvedReturnType.classId!!.toFlexibleConeClassType()
-                        }
+                        typeRef = buildResolvedTypeRef { type = typeArg }
                         variance = Variance.INVARIANT
                     }
                     val receiver = buildPropertyAccessExpression {
@@ -262,157 +224,154 @@ class AsyncFunctionGenerator(session: FirSession) : FirDeclarationGenerationExte
                         }
                         calleeReference = buildResolvedNamedReference {
                             name = Names.ASYNC_EXECUTOR_NAME
-                            resolvedSymbol = session.symbolProvider.getTopLevelCallableSymbols(ASYNC_EXECUTOR_FQN, Names.ASYNC_EXECUTOR_NAME)[0]
+                            resolvedSymbol = Finder.findInternalThreadPoolSymbol(session)
                         }
                     }
                     explicitReceiver = receiver
                     dispatchReceiver = receiver
-                    val submitSymbol = symbols[0]
                     calleeReference = buildResolvedNamedReference {
                         name = Names.SUBMIT_NAME
-                        resolvedSymbol = submitSymbol
+                        resolvedSymbol = Finder.findSubmitSymbol(session)
                     }
-                    argumentList = buildResolvedArgumentList(
-                        LinkedHashMap(mapOf(
-                            buildLambdaArgumentExpression {
-                                expression = buildAnonymousFunctionExpression {
-                                    anonymousFunction = buildAnonymousFunction {
-                                        // intentionally added to treat anonymous function as lambda
-                                        source = KtRealPsiSourceElement(KtFunctionLiteral(
-                                            CompositeElement(KtNodeTypes.FUNCTION_LITERAL)))
-                                        moduleData = session.moduleData
-                                        origin = Key.origin
-                                        symbol = FirAnonymousFunctionSymbol()
-                                        inlineStatus = InlineStatus.NoInline
-                                        label = buildLabel { name = "submit" }
-                                        isLambda = true
-                                        hasExplicitParameterList = false
-                                        val retTypeRef = original.resolvedReturnType.classId!!.toFlexibleConeClassType()
-                                        returnTypeRef = buildResolvedTypeRef {
-                                            type = retTypeRef
-                                        }
-                                        typeRef = buildResolvedTypeRef {
-                                            type = Names.FUNCTION0_CLASS_ID.toConeClassType(arrayOf(retTypeRef))
-                                        }
-                                    }.also { anonFunc1 ->
-                                        anonFunc1.replaceBody(buildSingleExpressionBlock(
-                                            statement = buildReturnExpression {
-                                                target = FirFunctionTarget(
-                                                    labelName = null,
-                                                    isLambda = true
-                                                ).apply {
-                                                    bind(anonFunc1)
-                                                }
-                                                result = buildFunctionCall {
-                                                    typeRef = original.resolvedReturnTypeRef
-                                                    typeArguments += buildTypeProjectionWithVariance {
-                                                        typeRef = original.resolvedReturnTypeRef
-                                                        variance = Variance.INVARIANT
-                                                    }
-                                                    val runBlockingSymbol = Finder.findRunBlockingSymbol(session)
-                                                    calleeReference = buildResolvedNamedReference {
-                                                        name = Names.RUN_BLOCKING_NAME
-                                                        resolvedSymbol = runBlockingSymbol
-                                                    }
-                                                    argumentList = buildResolvedArgumentList(
-                                                        LinkedHashMap(mapOf(
-                                                            buildLambdaArgumentExpression {
-                                                                expression = buildAnonymousFunctionExpression {
-                                                                    anonymousFunction = buildAnonymousFunction {
-                                                                        // intentionally added to treat anonymous function as lambda
-                                                                        source = KtRealPsiSourceElement(KtFunctionLiteral(
-                                                                            CompositeElement(KtNodeTypes.FUNCTION_LITERAL)))
-                                                                        val runBlockingValParam = runBlockingSymbol.fir.valueParameters[1]
-                                                                        moduleData = session.moduleData
-                                                                        origin = Key.origin
-                                                                        returnTypeRef = original.resolvedReturnTypeRef
-                                                                        receiverTypeRef = buildResolvedTypeRef {
-                                                                            type = ClassId(
-                                                                                FqName.fromSegments(listOf("kotlinx", "coroutines")),
-                                                                                Name.identifier("CoroutineScope")
-                                                                            ).toConeClassType()
-                                                                        }
-                                                                        symbol = FirAnonymousFunctionSymbol()
-                                                                        label = buildLabel { name = "runBlocking" }
-                                                                        invocationKind = EventOccurrencesRange.EXACTLY_ONCE
-                                                                        inlineStatus = InlineStatus.NoInline
-                                                                        isLambda = true
-                                                                        hasExplicitParameterList = false
-                                                                        typeRef = buildResolvedTypeRef {
-                                                                            type = ClassId(FqName.fromSegments(listOf("kotlin", "coroutines")), Name.identifier("SuspendFunction1"))
-                                                                                .toConeClassType(arrayOf(
-                                                                                    runBlockingValParam.returnTypeRef.coneType.typeArguments[0],
-                                                                                    original.resolvedReturnType
-                                                                                ), attributes = ConeAttributes.WithExtensionFunctionType)
-                                                                        }
-                                                                    }.also { anonFunc2 ->
-                                                                        anonFunc2.replaceBody(buildSingleExpressionBlock(
-                                                                            statement = buildReturnExpression {
-                                                                                target = FirFunctionTarget(
-                                                                                    labelName = null,
-                                                                                    isLambda = true
-                                                                                ).apply {
-                                                                                    bind(anonFunc2)
-                                                                                }
-                                                                                result = buildFunctionCall {
-                                                                                    typeRef = original.resolvedReturnTypeRef
-                                                                                    dispatchReceiver = owner?.let {
-                                                                                        buildThisReceiverExpression {
-                                                                                            typeRef = buildResolvedTypeRef {
-                                                                                                type = owner.classId.toConeClassType()
-                                                                                            }
-                                                                                            calleeReference = buildImplicitThisReference {
-                                                                                                boundSymbol = owner
-                                                                                            }
-                                                                                            isImplicit = true
-                                                                                        }
-                                                                                    } ?: FirNoReceiverExpression
-                                                                                    argumentList = buildResolvedArgumentList(LinkedHashMap(
-                                                                                        mapOf(
-                                                                                            *this@generateBody.valueParameters.map { param ->
-                                                                                                buildPropertyAccessExpression {
-                                                                                                    typeRef = param.returnTypeRef
-                                                                                                    calleeReference = buildResolvedNamedReference {
-                                                                                                        name = param.name
-                                                                                                        resolvedSymbol = param.symbol
-                                                                                                    }
-                                                                                                } to original.fir.valueParameters.find { it.name == param.name}!!
-                                                                                            }.toTypedArray()
-                                                                                        )
-                                                                                    ))
-                                                                                    calleeReference =
-                                                                                        buildResolvedNamedReference {
-                                                                                            name = original.name
-                                                                                            resolvedSymbol = original
-                                                                                        }
-                                                                                }
-                                                                            }
-                                                                        ).apply {
-                                                                            replaceTypeRef(original.resolvedReturnTypeRef)
-                                                                        })
-                                                                    }
-                                                                }
-                                                            } to runBlockingSymbol.fir.valueParameters[1]
-                                                        ))
-                                                    )
-                                                }
-                                            }
-                                        ).apply { replaceTypeRef(original.resolvedReturnTypeRef) }
-                                        )
-                                    }
-                                }
-                            } to submitSymbol.fir.valueParameters[0]
-                        ))
-                    )
+                    argumentList = this@generateBody.generateArgumentList(original, owner)
                 }
             }
         ).apply {
-                replaceTypeRef(
-                    buildResolvedTypeRef {
-                        type = ClassId(FqName("kotlin"), Name.identifier("Nothing")).toConeClassType()
+            replaceTypeRef(buildResolvedTypeRef { type = NOTHING_CLASS_ID.toConeClassType() })
+        }
+    }
+
+    @OptIn(SymbolInternals::class)
+    private fun FirSimpleFunction.generateArgumentList(original: FirNamedFunctionSymbol, owner: FirClassSymbol<*>?): FirResolvedArgumentList {
+        return buildResolvedArgumentList(
+            LinkedHashMap(mapOf(
+                buildLambdaArgumentExpression {
+                    expression = buildAnonymousFunctionExpression {
+                        anonymousFunction = buildAnonymousFunction {
+                            // intentionally added to treat anonymous function as lambda
+                            source = KtRealPsiSourceElement(KtFunctionLiteral(
+                                CompositeElement(KtNodeTypes.FUNCTION_LITERAL)
+                            ))
+                            moduleData = session.moduleData
+                            origin = Key.origin
+                            symbol = FirAnonymousFunctionSymbol()
+                            inlineStatus = InlineStatus.NoInline
+                            label = buildLabel { name = "submit" }
+                            isLambda = true
+                            hasExplicitParameterList = false
+                            val retTypeRef = original.resolvedReturnType.classId!!.toFlexibleConeClassType()
+                            returnTypeRef = buildResolvedTypeRef {
+                                type = retTypeRef
+                            }
+                            typeRef = buildResolvedTypeRef {
+                                type = Names.FUNCTION0_CLASS_ID.toConeClassType(arrayOf(retTypeRef))
+                            }
+                        }.also { anonFunc1 ->
+                            anonFunc1.replaceBody(buildSingleExpressionBlock(
+                                statement = buildReturnExpression {
+                                    target = FirFunctionTarget(
+                                        labelName = null,
+                                        isLambda = true
+                                    ).apply {
+                                        bind(anonFunc1)
+                                    }
+                                    result = buildFunctionCall {
+                                        typeRef = original.resolvedReturnTypeRef
+                                        typeArguments += buildTypeProjectionWithVariance {
+                                            typeRef = original.resolvedReturnTypeRef
+                                            variance = Variance.INVARIANT
+                                        }
+                                        calleeReference = buildResolvedNamedReference {
+                                            name = Names.RUN_BLOCKING_NAME
+                                            resolvedSymbol = Finder.findRunBlockingSymbol(session)
+                                        }
+                                        argumentList = buildResolvedArgumentList(
+                                            LinkedHashMap(mapOf(
+                                                buildLambdaArgumentExpression {
+                                                    expression = buildAnonymousFunctionExpression {
+                                                        anonymousFunction = buildAnonymousFunction {
+                                                            // intentionally added to treat anonymous function as lambda
+                                                            source = KtRealPsiSourceElement(KtFunctionLiteral(
+                                                                CompositeElement(KtNodeTypes.FUNCTION_LITERAL)
+                                                            ))
+                                                            val runBlockingValParam = Finder.findRunBlockingSymbol(session).fir.valueParameters[1]
+                                                            moduleData = session.moduleData
+                                                            origin = Key.origin
+                                                            returnTypeRef = original.resolvedReturnTypeRef
+                                                            receiverTypeRef = buildResolvedTypeRef {
+                                                                type = COROUTINE_SCOPE_CLASS_ID.toConeClassType()
+                                                            }
+                                                            symbol = FirAnonymousFunctionSymbol()
+                                                            label = buildLabel { name = "runBlocking" }
+                                                            invocationKind = EventOccurrencesRange.EXACTLY_ONCE
+                                                            inlineStatus = InlineStatus.NoInline
+                                                            isLambda = true
+                                                            hasExplicitParameterList = false
+                                                            typeRef = buildResolvedTypeRef {
+                                                                type = SUSPEND_FUNCTION_CLASS_ID.toConeClassType(arrayOf(
+                                                                        runBlockingValParam.returnTypeRef.coneType.typeArguments[0],
+                                                                        original.resolvedReturnType
+                                                                    ), attributes = ConeAttributes.WithExtensionFunctionType)
+                                                            }
+                                                        }.also { anonFunc2 ->
+                                                            anonFunc2.replaceBody(buildSingleExpressionBlock(
+                                                                statement = buildReturnExpression {
+                                                                    target = FirFunctionTarget(
+                                                                        labelName = null,
+                                                                        isLambda = true
+                                                                    ).apply {
+                                                                        bind(anonFunc2)
+                                                                    }
+                                                                    result = buildFunctionCall {
+                                                                        typeRef = original.resolvedReturnTypeRef
+                                                                        dispatchReceiver = owner?.let {
+                                                                            buildThisReceiverExpression {
+                                                                                typeRef = buildResolvedTypeRef {
+                                                                                    type = owner.classId.toConeClassType()
+                                                                                }
+                                                                                calleeReference = buildImplicitThisReference {
+                                                                                    boundSymbol = owner
+                                                                                }
+                                                                                isImplicit = true
+                                                                            }
+                                                                        } ?: FirNoReceiverExpression
+                                                                        argumentList = buildResolvedArgumentList(LinkedHashMap(
+                                                                            mapOf(
+                                                                                *this@generateArgumentList.valueParameters.map { param ->
+                                                                                    buildPropertyAccessExpression {
+                                                                                        typeRef = param.returnTypeRef
+                                                                                        calleeReference = buildResolvedNamedReference {
+                                                                                            name = param.name
+                                                                                            resolvedSymbol = param.symbol
+                                                                                        }
+                                                                                    } to original.fir.valueParameters.find { it.name == param.name}!!
+                                                                                }.toTypedArray()
+                                                                            )
+                                                                        ))
+                                                                        calleeReference =
+                                                                            buildResolvedNamedReference {
+                                                                                name = original.name
+                                                                                resolvedSymbol = original
+                                                                            }
+                                                                    }
+                                                                }
+                                                            ).apply {
+                                                                replaceTypeRef(original.resolvedReturnTypeRef)
+                                                            })
+                                                        }
+                                                    }
+                                                } to Finder.findRunBlockingSymbol(session).fir.valueParameters[1]
+                                            ))
+                                        )
+                                    }
+                                }
+                            ).apply { replaceTypeRef(original.resolvedReturnTypeRef) }
+                            )
+                        }
                     }
-                )
-            }
+                } to Finder.findSubmitSymbol(session).fir.valueParameters[0]
+            ))
+        )
     }
 
     private fun ClassId.toFlexibleConeClassType(typeArgs: Array<ConeTypeProjection> = emptyArray()): ConeFlexibleType {

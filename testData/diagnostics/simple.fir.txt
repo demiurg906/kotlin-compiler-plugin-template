@@ -1,16 +1,25 @@
 FILE: simple.kt
     package foo.bar
 
-    @R|org/itmo/my/pretty/plugin/SomeAnnotation|() public final fun test(): R|kotlin/Unit| {
-        lval s: R|kotlin/String| = R|foo/bar/MyClass|().R|foo/bar/MyClass.foo|()
-        R|<local>/s|.<Unresolved name: inc>#()
+    @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final class MyClass : R|kotlin/Any| {
+        public constructor(): R|foo/bar/MyClass| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final suspend fun foo(): R|kotlin/String| {
+            ^foo String(Hello, world!)
+        }
+
+    }
+    @R|ru/itmo/kotlin/plugin/desuspender/DeSuspend|() public final fun test(): R|kotlin/Unit| {
+        lval s: R|foo/bar/MyClass| = R|foo/bar/MyClass.MyClass|()
+        R|<local>/s|.<Unresolved name: fooAsync>#()
     }
 FILE: __GENERATED DECLARATIONS__.kt
     package foo.bar
 
-    public final class MyClass : R|kotlin/Any| {
-        public final fun foo(): R|kotlin/String|
+FILE: __GENERATED DECLARATIONS__.kt
+    package ru.itmo.kotlin.plugin.desuspender
 
-        public constructor(): R|foo/bar/MyClass|
-
-    }
+    public final val internal_executor: R|ft<java/util/concurrent/ExecutorService, java/util/concurrent/ExecutorService?>| = Q|java/util/concurrent/Executors|.R|java/util/concurrent/Executors.newFixedThreadPool|(Int(10))
+        public get(): R|ft<java/util/concurrent/ExecutorService, java/util/concurrent/ExecutorService?>|
