@@ -48,6 +48,7 @@ dependencies {
 }
 
 tasks.test {
+    dependsOn(project(":plugin-annotations").tasks.getByName("jar"))
     useJUnitPlatform()
     doFirst {
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
@@ -66,9 +67,15 @@ tasks.withType<KotlinCompile>().configureEach {
     }
 }
 
-tasks.create<JavaExec>("generateTests") {
+val generateTests by tasks.creating(JavaExec::class) {
     classpath = sourceSets.test.get().runtimeClasspath
     mainClass.set("ru.itmo.kotlin.plugin.GenerateTestsKt")
+}
+
+val compileTestKotlin by tasks.getting {
+    doLast {
+        generateTests.exec()
+    }
 }
 
 fun Test.setLibraryProperty(propName: String, jarName: String) {
