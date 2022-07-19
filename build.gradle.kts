@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version "1.7.20-dev-474"
+    kotlin("jvm") version "1.8.0-dev-446"
 }
 group = "ru.itmo.kotlin.plugin"
 version = "0.1"
@@ -61,7 +61,8 @@ tasks.test {
 
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
-        useFir = true
+        useK2 = true
+        freeCompilerArgs += "-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi"
     }
 }
 

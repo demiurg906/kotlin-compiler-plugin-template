@@ -1,18 +1,20 @@
 package ru.itmo.kotlin.plugin.fir
 
+import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.containingClassForStaticMemberAttr
-import org.jetbrains.kotlin.fir.declarations.FirPluginKey
 import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
 import org.jetbrains.kotlin.fir.declarations.builder.buildPrimaryConstructor
 import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
 import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
+import org.jetbrains.kotlin.fir.declarations.origin
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
+import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
 import org.jetbrains.kotlin.fir.moduleData
 import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
 import org.jetbrains.kotlin.fir.symbols.impl.*
@@ -60,8 +62,8 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         return ConeClassLikeTypeImpl(lookupTag, typeArguments, isNullable = false)
     }
 
-    override fun generateConstructors(owner: FirClassSymbol<*>): List<FirConstructorSymbol> {
-        val classId = owner.classId
+    override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
+        val classId = context.owner.classId
         require(classId == MY_CLASS_ID)
         val constructor = buildPrimaryConstructor {
             resolvePhase = FirResolvePhase.BODY_RESOLVE
@@ -82,7 +84,10 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         return listOf(constructor.symbol)
     }
 
-    override fun generateFunctions(callableId: CallableId, owner: FirClassSymbol<*>?): List<FirNamedFunctionSymbol> {
+    override fun generateFunctions(
+        callableId: CallableId,
+        context: MemberGenerationContext?
+    ): List<FirNamedFunctionSymbol> {
         val function = buildSimpleFunction {
             resolvePhase = FirResolvePhase.BODY_RESOLVE
             moduleData = session.moduleData
@@ -118,5 +123,5 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         return packageFqName == MY_CLASS_ID.packageFqName
     }
 
-    object Key : FirPluginKey()
+    object Key : GeneratedDeclarationKey()
 }
