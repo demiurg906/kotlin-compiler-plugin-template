@@ -1,0 +1,56 @@
+FILE: context_receivers.kt
+    package foo.bar
+
+    public final class Persistence : R|kotlin/Any| {
+        public constructor(): R|foo/bar/Persistence| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    public final class X : R|kotlin/Any| {
+        public constructor(): R|foo/bar/X| {
+            super<R|kotlin/Any|>()
+        }
+
+    }
+    context(R|foo/bar/Persistence|, R|foo/bar/X|)
+    public final class Repo : R|kotlin/Any| {
+        public constructor(n: R|kotlin/Int|): R|foo/bar/Repo| {
+            super<R|kotlin/Any|>()
+        }
+
+        public final val n: R|kotlin/Int| = R|<local>/n|
+            public get(): R|kotlin/Int|
+
+    }
+    public final fun f(): R|kotlin/Int| {
+        R|kotlin/io/println|(String(123))
+        ^f R|kotlin/with|<R|foo/bar/X|, R|kotlin/Int|>(R|foo/bar/X.X|(), <L> = with@fun R|foo/bar/X|.<anonymous>(): R|kotlin/Int| <inline=Inline, kind=EXACTLY_ONCE>  {
+            ^ R|kotlin/with|<R|foo/bar/Persistence|, R|kotlin/Int|>(R|foo/bar/Persistence.Persistence|(), <L> = with@fun R|foo/bar/Persistence|.<anonymous>(): R|kotlin/Int| <inline=Inline, kind=EXACTLY_ONCE>  {
+                ^ R|foo/bar/Repo.Repo|(Int(0)).R|foo/bar/Repo.n|
+            }
+            )
+        }
+        )
+    }
+    public final fun box(): R|kotlin/String| {
+        lval result: R|kotlin/Int| = R|foo/bar/f|()
+        ^box when () {
+            ==(R|<local>/result|, Int(0)) ->  {
+                String(OK)
+            }
+            else ->  {
+                <strcat>(String(Fail: ), R|<local>/result|)
+            }
+        }
+
+    }
+FILE: __GENERATED DECLARATIONS__.kt
+    package foo.bar
+
+    public final class MyClass : R|kotlin/Any| {
+        public final fun foo(): R|kotlin/String|
+
+        public constructor(): R|foo/bar/MyClass|
+
+    }

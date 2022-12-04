@@ -23,6 +23,12 @@ public class BoxTestGenerated extends AbstractBoxTest {
     }
 
     @Test
+    @TestMetadata("context_receivers.kt")
+    public void testContext_receivers() throws Exception {
+        runTest("testData/box/context_receivers.kt");
+    }
+
+    @Test
     @TestMetadata("simple.kt")
     public void testSimple() throws Exception {
         runTest("testData/box/simple.kt");
