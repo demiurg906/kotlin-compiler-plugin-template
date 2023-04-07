@@ -38,7 +38,7 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         val FOO_ID = CallableId(MY_CLASS_ID, Name.identifier("foo"))
     }
 
-    override fun generateClassLikeDeclaration(classId: ClassId): FirClassLikeSymbol<*>? {
+    override fun generateTopLevelClassLikeDeclaration(classId: ClassId): FirClassLikeSymbol<*>? {
         if (classId != MY_CLASS_ID) return null
         val klass = buildRegularClass {
             moduleData = session.moduleData
@@ -107,7 +107,7 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         return listOf(function.symbol)
     }
 
-    override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>): Set<Name> {
+    override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
         return if (classSymbol.classId == MY_CLASS_ID) {
             setOf(FOO_ID.callableName, SpecialNames.INIT)
         } else {
