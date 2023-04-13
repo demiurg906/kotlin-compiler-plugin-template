@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version "1.8.0-dev-446"
+    kotlin("jvm") version "1.9.0-dev-4392"
 }
 group = "ru.itmo.kotlin.plugin"
 version = "0.1"
@@ -37,7 +37,7 @@ dependencies {
 
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
     testImplementation("org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:$kotlinVersion")
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13.2")
 
     testImplementation(platform("org.junit:junit-bom:5.8.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")

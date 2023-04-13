@@ -1,6 +1,7 @@
 package ru.itmo.kotlin.plugin.runners
 
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
+import org.jetbrains.kotlin.test.FirParser
 import org.jetbrains.kotlin.test.TargetBackend
 import org.jetbrains.kotlin.test.backend.BlackBoxCodegenSuppressor
 import org.jetbrains.kotlin.test.backend.handlers.IrTextDumpHandler
@@ -12,9 +13,19 @@ import org.jetbrains.kotlin.test.builders.fir2IrStep
 import org.jetbrains.kotlin.test.builders.irHandlersStep
 import org.jetbrains.kotlin.test.builders.jvmArtifactsHandlersStep
 import org.jetbrains.kotlin.test.directives.CodegenTestDirectives.DUMP_IR
+import org.jetbrains.kotlin.test.directives.configureFirParser
 import org.jetbrains.kotlin.test.model.DependencyKind
 import org.jetbrains.kotlin.test.runners.RunnerWithTargetBackendForTestGeneratorMarker
 
+/*
+ * Containers of different directives, which can be used in tests:
+ * - ModuleStructureDirectives
+ * - LanguageSettingsDirectives
+ * - DiagnosticsDirectives
+ * - CodegenTestDirectives
+ *
+ * All of them are located in `org.jetbrains.kotlin.test.directives` package
+ */
 open class AbstractBoxTest : BaseTestRunner(), RunnerWithTargetBackendForTestGeneratorMarker {
     override val targetBackend: TargetBackend
         get() = TargetBackend.JVM_IR
@@ -25,6 +36,8 @@ open class AbstractBoxTest : BaseTestRunner(), RunnerWithTargetBackendForTestGen
             targetPlatform = JvmPlatforms.defaultJvmPlatform
             dependencyKind = DependencyKind.Binary
         }
+
+        configureFirParser(FirParser.Psi)
 
         defaultDirectives {
             +DUMP_IR
