@@ -1,6 +1,6 @@
 
 
-package ru.itmo.kotlin.plugin.runners;
+package org.demiurg906.kotlin.plugin.runners;
 
 import com.intellij.testFramework.TestDataPath;
 import org.jetbrains.kotlin.test.util.KtTestUtil;

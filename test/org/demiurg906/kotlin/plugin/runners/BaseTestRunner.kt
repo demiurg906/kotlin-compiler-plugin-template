@@ -1,4 +1,4 @@
-package ru.itmo.kotlin.plugin.runners
+package org.demiurg906.kotlin.plugin.runners
 
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.ConfigurationDirectives
@@ -9,8 +9,8 @@ import org.jetbrains.kotlin.test.runners.baseFirDiagnosticTestConfiguration
 import org.jetbrains.kotlin.test.services.EnvironmentBasedStandardLibrariesPathProvider
 import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
 import org.junit.jupiter.api.BeforeAll
-import ru.itmo.kotlin.plugin.services.ExtensionRegistrarConfigurator
-import ru.itmo.kotlin.plugin.services.PluginAnnotationsProvider
+import org.demiurg906.kotlin.plugin.services.ExtensionRegistrarConfigurator
+import org.demiurg906.kotlin.plugin.services.PluginAnnotationsProvider
 
 abstract class BaseTestRunner : AbstractKotlinCompilerTest() {
     companion object {

@@ -1,4 +1,4 @@
-package ru.itmo.kotlin.plugin.services
+package org.demiurg906.kotlin.plugin.services
 
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoot
 import org.jetbrains.kotlin.config.CompilerConfiguration

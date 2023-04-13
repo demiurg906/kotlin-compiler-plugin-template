@@ -1,4 +1,4 @@
-package ru.itmo.kotlin.plugin.services
+package org.demiurg906.kotlin.plugin.services
 
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
@@ -7,8 +7,8 @@ import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.TestServices
-import ru.itmo.kotlin.plugin.SimplePluginRegistrar
-import ru.itmo.kotlin.plugin.ir.SimpleIrGenerationExtension
+import org.demiurg906.kotlin.plugin.SimplePluginRegistrar
+import org.demiurg906.kotlin.plugin.ir.SimpleIrGenerationExtension
 
 class ExtensionRegistrarConfigurator(testServices: TestServices) : EnvironmentConfigurator(testServices) {
     override fun CompilerPluginRegistrar.ExtensionStorage.registerCompilerExtensions(

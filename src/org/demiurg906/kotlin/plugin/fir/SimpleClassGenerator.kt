@@ -1,4 +1,4 @@
-package ru.itmo.kotlin.plugin.fir
+package org.demiurg906.kotlin.plugin.fir
 
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.ClassKind

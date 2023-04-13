@@ -4,7 +4,7 @@ plugins {
     java
     kotlin("jvm") version "1.9.0-dev-4392"
 }
-group = "ru.itmo.kotlin.plugin"
+group = "org.demiurg906.kotlin.plugin"
 version = "0.1"
 
 val kotlinVersion: String by project.properties

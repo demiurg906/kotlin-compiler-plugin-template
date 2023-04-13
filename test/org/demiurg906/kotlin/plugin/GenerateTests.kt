@@ -1,8 +1,8 @@
-package ru.itmo.kotlin.plugin
+package org.demiurg906.kotlin.plugin
 
 import org.jetbrains.kotlin.generators.generateTestGroupSuiteWithJUnit5
-import ru.itmo.kotlin.plugin.runners.AbstractBoxTest
-import ru.itmo.kotlin.plugin.runners.AbstractDiagnosticTest
+import org.demiurg906.kotlin.plugin.runners.AbstractBoxTest
+import org.demiurg906.kotlin.plugin.runners.AbstractDiagnosticTest
 
 fun main() {
     generateTestGroupSuiteWithJUnit5 {

@@ -1,4 +1,4 @@
-package ru.itmo.kotlin.plugin.runners
+package org.demiurg906.kotlin.plugin.runners
 
 import org.jetbrains.kotlin.test.FirParser
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
