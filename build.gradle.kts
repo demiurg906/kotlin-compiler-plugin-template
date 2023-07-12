@@ -68,7 +68,7 @@ tasks.withType<KotlinCompile>().configureEach {
 
 tasks.create<JavaExec>("generateTests") {
     classpath = sourceSets.test.get().runtimeClasspath
-    mainClass.set("ru.itmo.kotlin.plugin.GenerateTestsKt")
+    mainClass.set("org.demiurg906.kotlin.plugin.GenerateTestsKt")
 }
 
 fun Test.setLibraryProperty(propName: String, jarName: String) {
