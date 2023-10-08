@@ -2,12 +2,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version "2.0.0-dev-4562"
+    alias(libs.plugins.kotlin.jvm)
 }
 group = "org.demiurg906.kotlin.plugin"
 version = "0.1"
 
-val kotlinVersion: String by project.properties
+val kotlinVersion: String = libs.versions.kotlin.get()
 
 repositories {
     mavenCentral()
