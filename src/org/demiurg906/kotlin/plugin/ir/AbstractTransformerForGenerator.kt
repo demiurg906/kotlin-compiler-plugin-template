@@ -37,17 +37,19 @@ abstract class AbstractTransformerForGenerator(protected val context: IrPluginCo
     }
 
     final override fun visitSimpleFunction(declaration: IrSimpleFunction) {
-        val origin = declaration.origin
-        if (origin !is IrDeclarationOrigin.GeneratedByPlugin || !interestedIn(origin.pluginKey)) return
+        val origin = declaration.origin as? IrDeclarationOrigin.GeneratedByPlugin ?: return
+        val pluginKey = origin.pluginKey ?: return
+        if (!interestedIn(pluginKey)) return
         require(declaration.body == null)
-        declaration.body = generateBodyForFunction(declaration, origin.pluginKey)
+        declaration.body = generateBodyForFunction(declaration, pluginKey)
     }
 
     final override fun visitConstructor(declaration: IrConstructor) {
-        val origin = declaration.origin
-        if (origin !is IrDeclarationOrigin.GeneratedByPlugin || !interestedIn(origin.pluginKey)) return
+        val origin = declaration.origin as? IrDeclarationOrigin.GeneratedByPlugin ?: return
+        val pluginKey = origin.pluginKey ?: return
+        if (!interestedIn(pluginKey)) return
         require(declaration.body == null)
-        declaration.body = generateBodyForConstructor(declaration, origin.pluginKey)
+        declaration.body = generateBodyForConstructor(declaration, pluginKey)
     }
 
     // ------------------------ utilities ------------------------
