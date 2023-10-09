@@ -16,6 +16,7 @@ import org.jetbrains.kotlin.test.directives.CodegenTestDirectives.DUMP_IR
 import org.jetbrains.kotlin.test.directives.configureFirParser
 import org.jetbrains.kotlin.test.model.DependencyKind
 import org.jetbrains.kotlin.test.runners.RunnerWithTargetBackendForTestGeneratorMarker
+import org.jetbrains.kotlin.test.runners.codegen.configureDumpHandlersForCodegenTest
 
 /*
  * Containers of different directives, which can be used in tests:
@@ -57,5 +58,6 @@ open class AbstractBoxTest : BaseTestRunner(), RunnerWithTargetBackendForTestGen
         }
 
         useAfterAnalysisCheckers(::BlackBoxCodegenSuppressor)
+        configureDumpHandlersForCodegenTest()
     }
 }
