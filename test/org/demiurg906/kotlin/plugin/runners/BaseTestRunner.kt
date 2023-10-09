@@ -33,13 +33,6 @@ abstract class BaseTestRunner : AbstractKotlinCompilerTest() {
 
 fun TestConfigurationBuilder.commonFirWithPluginFrontendConfiguration() {
     baseFirDiagnosticTestConfiguration()
-    commonConfigurationForTest(
-        targetFrontend = FrontendKinds.FIR,
-        frontendFacade = ::FirFrontendFacade,
-        frontendToBackendConverter = ::Fir2IrJvmResultsConverter,
-        backendFacade = ::JvmIrBackendFacade,
-        commonServicesConfiguration = {},
-    )
 
     defaultDirectives {
         +FirDiagnosticsDirectives.ENABLE_PLUGIN_PHASES

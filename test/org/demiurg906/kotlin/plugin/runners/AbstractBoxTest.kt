@@ -14,8 +14,12 @@ import org.jetbrains.kotlin.test.builders.irHandlersStep
 import org.jetbrains.kotlin.test.builders.jvmArtifactsHandlersStep
 import org.jetbrains.kotlin.test.directives.CodegenTestDirectives.DUMP_IR
 import org.jetbrains.kotlin.test.directives.configureFirParser
+import org.jetbrains.kotlin.test.frontend.fir.Fir2IrJvmResultsConverter
+import org.jetbrains.kotlin.test.frontend.fir.FirFrontendFacade
 import org.jetbrains.kotlin.test.model.DependencyKind
+import org.jetbrains.kotlin.test.model.FrontendKinds
 import org.jetbrains.kotlin.test.runners.RunnerWithTargetBackendForTestGeneratorMarker
+import org.jetbrains.kotlin.test.runners.codegen.commonConfigurationForTest
 import org.jetbrains.kotlin.test.runners.codegen.configureDumpHandlersForCodegenTest
 
 /*
@@ -45,6 +49,12 @@ open class AbstractBoxTest : BaseTestRunner(), RunnerWithTargetBackendForTestGen
         }
 
         commonFirWithPluginFrontendConfiguration()
+        commonConfigurationForTest(
+            targetFrontend = FrontendKinds.FIR,
+            frontendFacade = ::FirFrontendFacade,
+            frontendToBackendConverter = ::Fir2IrJvmResultsConverter,
+            backendFacade = ::JvmIrBackendFacade,
+        )
         fir2IrStep()
         irHandlersStep {
             useHandlers(
