@@ -14,6 +14,15 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
+            "-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+            "-Xcontext-receivers"
+        )
+    }
+}
+
 sourceSets {
     main {
         java.setSrcDirs(listOf("src"))
@@ -56,13 +65,6 @@ tasks.test {
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-test", "kotlin-test")
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-script-runtime", "kotlin-script-runtime")
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-annotations-jvm", "kotlin-annotations-jvm")
-    }
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        useK2 = true
-        freeCompilerArgs += "-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi"
     }
 }
 

@@ -2,27 +2,26 @@ package org.demiurg906.kotlin.plugin.fir
 
 import org.jetbrains.kotlin.GeneratedDeclarationKey
 import org.jetbrains.kotlin.descriptors.ClassKind
-import org.jetbrains.kotlin.descriptors.EffectiveVisibility
 import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.descriptors.Visibilities
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.containingClassForStaticMemberAttr
-import org.jetbrains.kotlin.fir.declarations.FirResolvePhase
-import org.jetbrains.kotlin.fir.declarations.builder.buildPrimaryConstructor
-import org.jetbrains.kotlin.fir.declarations.builder.buildRegularClass
-import org.jetbrains.kotlin.fir.declarations.builder.buildSimpleFunction
-import org.jetbrains.kotlin.fir.declarations.impl.FirResolvedDeclarationStatusImpl
-import org.jetbrains.kotlin.fir.declarations.origin
 import org.jetbrains.kotlin.fir.extensions.FirDeclarationGenerationExtension
 import org.jetbrains.kotlin.fir.extensions.MemberGenerationContext
-import org.jetbrains.kotlin.fir.moduleData
-import org.jetbrains.kotlin.fir.scopes.kotlinScopeProvider
-import org.jetbrains.kotlin.fir.symbols.impl.*
-import org.jetbrains.kotlin.fir.types.ConeClassLikeType
-import org.jetbrains.kotlin.fir.types.ConeTypeProjection
-import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.impl.ConeClassLikeTypeImpl
-import org.jetbrains.kotlin.name.*
+import org.jetbrains.kotlin.fir.plugin.createConstructor
+import org.jetbrains.kotlin.fir.plugin.createMemberFunction
+import org.jetbrains.kotlin.fir.plugin.createTopLevelClass
+import org.jetbrains.kotlin.fir.symbols.impl.ConeClassLikeLookupTagImpl
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassLikeSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirClassSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirConstructorSymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirNamedFunctionSymbol
+import org.jetbrains.kotlin.fir.types.coneType
+import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 /*
  * Generates top level class
@@ -33,54 +32,44 @@ import org.jetbrains.kotlin.name.*
  */
 class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtension(session) {
     companion object {
-        val MY_CLASS_ID = ClassId(FqName.fromSegments(listOf("foo", "bar")), Name.identifier("MyClass"))
+        val MY_CLASS_ID =
+            ClassId(FqName.fromSegments(listOf("foo", "bar")), Name.identifier("MyClass"))
 
         val FOO_ID = CallableId(MY_CLASS_ID, Name.identifier("foo"))
     }
 
     override fun generateTopLevelClassLikeDeclaration(classId: ClassId): FirClassLikeSymbol<*>? {
         if (classId != MY_CLASS_ID) return null
-        val klass = buildRegularClass {
-            moduleData = session.moduleData
-            origin = Key.origin
-            status = FirResolvedDeclarationStatusImpl(
-                Visibilities.Public,
-                Modality.FINAL,
-                EffectiveVisibility.Public
+        val klass =
+            createTopLevelClass(
+                classId = classId,
+                key = Key,
+                classKind = ClassKind.CLASS,
+                config = {
+                    visibility = Visibilities.Public
+                    modality = Modality.FINAL
+                },
             )
-            classKind = ClassKind.CLASS
-            scopeProvider = session.kotlinScopeProvider
-            name = classId.shortClassName
-            symbol = FirRegularClassSymbol(classId)
-            superTypeRefs.add(session.builtinTypes.anyType)
-        }
         return klass.symbol
     }
 
-    private fun ClassId.toConeType(typeArguments: Array<ConeTypeProjection> = emptyArray()): ConeClassLikeType {
-        val lookupTag = ConeClassLikeLookupTagImpl(this)
-        return ConeClassLikeTypeImpl(lookupTag, typeArguments, isNullable = false)
-    }
-
-    override fun generateConstructors(context: MemberGenerationContext): List<FirConstructorSymbol> {
+    override fun generateConstructors(
+        context: MemberGenerationContext
+    ): List<FirConstructorSymbol> {
         val classId = context.owner.classId
         require(classId == MY_CLASS_ID)
-        val constructor = buildPrimaryConstructor {
-            resolvePhase = FirResolvePhase.BODY_RESOLVE
-            moduleData = session.moduleData
-            origin = Key.origin
-            returnTypeRef = buildResolvedTypeRef {
-                type = classId.toConeType()
-            }
-            status = FirResolvedDeclarationStatusImpl(
-                Visibilities.Public,
-                Modality.FINAL,
-                EffectiveVisibility.Public
-            )
-            symbol = FirConstructorSymbol(classId)
-        }.also {
-            it.containingClassForStaticMemberAttr = ConeClassLikeLookupTagImpl(classId)
-        }
+        val constructor =
+            createConstructor(
+                    owner = context.owner,
+                    key = Key,
+                    isPrimary = true,
+                    generateDelegatedNoArgConstructorCall = false,
+                    config = {
+                        visibility = Visibilities.Public
+                        modality = Modality.FINAL
+                    },
+                )
+                .apply { containingClassForStaticMemberAttr = ConeClassLikeLookupTagImpl(classId) }
         return listOf(constructor.symbol)
     }
 
@@ -88,26 +77,25 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         callableId: CallableId,
         context: MemberGenerationContext?
     ): List<FirNamedFunctionSymbol> {
-        val function = buildSimpleFunction {
-            resolvePhase = FirResolvePhase.BODY_RESOLVE
-            moduleData = session.moduleData
-            origin = Key.origin
-            status = FirResolvedDeclarationStatusImpl(
-                Visibilities.Public,
-                Modality.FINAL,
-                EffectiveVisibility.Public
+        val owner = context?.owner ?: return emptyList()
+        val function =
+            createMemberFunction(
+                owner = owner,
+                key = Key,
+                name = callableId.callableName,
+                returnTypeProvider = { session.builtinTypes.stringType.coneType },
+                config = {
+                    visibility = Visibilities.Public
+                    modality = Modality.FINAL
+                },
             )
-            returnTypeRef = session.builtinTypes.stringType
-            name = callableId.callableName
-            symbol = FirNamedFunctionSymbol(callableId)
-            // it's better to use default type on corresponding firClass to handle type parameters
-            // but in this case we know that MyClass don't have any generics
-            dispatchReceiverType = callableId.classId?.toConeType()
-        }
         return listOf(function.symbol)
     }
 
-    override fun getCallableNamesForClass(classSymbol: FirClassSymbol<*>, context: MemberGenerationContext): Set<Name> {
+    override fun getCallableNamesForClass(
+        classSymbol: FirClassSymbol<*>,
+        context: MemberGenerationContext
+    ): Set<Name> {
         return if (classSymbol.classId == MY_CLASS_ID) {
             setOf(FOO_ID.callableName, SpecialNames.INIT)
         } else {
