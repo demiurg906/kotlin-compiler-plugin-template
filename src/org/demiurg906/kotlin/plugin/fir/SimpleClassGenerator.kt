@@ -41,6 +41,7 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
     override fun generateTopLevelClassLikeDeclaration(classId: ClassId): FirClassLikeSymbol<*>? {
         if (classId != MY_CLASS_ID) return null
         val klass = buildRegularClass {
+            resolvePhase = FirResolvePhase.BODY_RESOLVE
             moduleData = session.moduleData
             origin = Key.origin
             status = FirResolvedDeclarationStatusImpl(
