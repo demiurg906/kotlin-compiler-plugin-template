@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
 import org.junit.jupiter.api.BeforeAll
 import org.demiurg906.kotlin.plugin.services.ExtensionRegistrarConfigurator
 import org.demiurg906.kotlin.plugin.services.PluginAnnotationsProvider
+import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives
 
 abstract class BaseTestRunner : AbstractKotlinCompilerTest() {
     companion object {
@@ -32,6 +33,7 @@ fun TestConfigurationBuilder.commonFirWithPluginFrontendConfiguration() {
     defaultDirectives {
         +FirDiagnosticsDirectives.ENABLE_PLUGIN_PHASES
         +FirDiagnosticsDirectives.FIR_DUMP
+        +JvmEnvironmentConfigurationDirectives.FULL_JDK
     }
 
     useConfigurators(

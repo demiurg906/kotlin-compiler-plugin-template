@@ -2,18 +2,18 @@ FILE fqName:<root> fileName:/anotherBoxTest.kt
   FUN name:box visibility:public modality:FINAL <> () returnType:kotlin.String
     BLOCK_BODY
       VAR name:list type:kotlin.collections.List<kotlin.String> [val]
-        CALL 'public final fun listOf <T> (vararg elements: T of kotlin.collections.CollectionsKt.listOf): kotlin.collections.List<T of kotlin.collections.CollectionsKt.listOf> declared in kotlin.collections.CollectionsKt' type=kotlin.collections.List<kotlin.String> origin=null
+        CALL 'public final fun listOf <T> (vararg elements: T of kotlin.collections.listOf): kotlin.collections.List<T of kotlin.collections.listOf> declared in kotlin.collections' type=kotlin.collections.List<kotlin.String> origin=null
           <T>: kotlin.String
           elements: VARARG type=kotlin.Array<out kotlin.String> varargElementType=kotlin.String
             CONST String type=kotlin.String value="aaa"
             CONST String type=kotlin.String value="bb"
             CONST String type=kotlin.String value="c"
       VAR name:result type:kotlin.Int [val]
-        CALL 'public final fun sum (): kotlin.Int declared in kotlin.collections.CollectionsKt' type=kotlin.Int origin=null
-          $receiver: CALL 'public final fun map <T, R> (transform: kotlin.Function1<T of kotlin.collections.CollectionsKt.map, R of kotlin.collections.CollectionsKt.map>): kotlin.collections.List<R of kotlin.collections.CollectionsKt.map> [inline] declared in kotlin.collections.CollectionsKt' type=kotlin.collections.List<kotlin.Int> origin=null
+        CALL 'public final fun sum (): kotlin.Int declared in kotlin.collections' type=kotlin.Int origin=null
+          $receiver: CALL 'public final fun map <T, R> (transform: kotlin.Function1<T of kotlin.collections.map, R of kotlin.collections.map>): kotlin.collections.List<R of kotlin.collections.map> declared in kotlin.collections' type=kotlin.collections.List<kotlin.Int> origin=null
             <T>: kotlin.String
             <R>: kotlin.Int
-            $receiver: GET_VAR 'val list: kotlin.collections.List<kotlin.String> [val] declared in <root>.box' type=kotlin.collections.List<kotlin.String> origin=null
+            $receiver: GET_VAR 'val list: kotlin.collections.List<kotlin.String> declared in <root>.box' type=kotlin.collections.List<kotlin.String> origin=null
             transform: FUN_EXPR type=kotlin.Function1<kotlin.String, kotlin.Int> origin=LAMBDA
               FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> (it:kotlin.String) returnType:kotlin.Int
                 VALUE_PARAMETER name:it index:0 type:kotlin.String
@@ -25,11 +25,11 @@ FILE fqName:<root> fileName:/anotherBoxTest.kt
         WHEN type=kotlin.String origin=IF
           BRANCH
             if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=EQEQ
-              arg0: GET_VAR 'val result: kotlin.Int [val] declared in <root>.box' type=kotlin.Int origin=null
+              arg0: GET_VAR 'val result: kotlin.Int declared in <root>.box' type=kotlin.Int origin=null
               arg1: CONST Int type=kotlin.Int value=6
             then: CONST String type=kotlin.String value="OK"
           BRANCH
             if: CONST Boolean type=kotlin.Boolean value=true
             then: STRING_CONCATENATION type=kotlin.String
               CONST String type=kotlin.String value="Fail: "
-              GET_VAR 'val result: kotlin.Int [val] declared in <root>.box' type=kotlin.Int origin=null
+              GET_VAR 'val result: kotlin.Int declared in <root>.box' type=kotlin.Int origin=null
