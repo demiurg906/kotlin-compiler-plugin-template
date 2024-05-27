@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     java
-    kotlin("jvm") version "2.0.0-RC2"
+    kotlin("jvm") version "2.0.0"
 }
 group = "org.demiurg906.kotlin.plugin"
 version = "0.1"
@@ -61,9 +61,9 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions {
-        useK2 = true
-        freeCompilerArgs += "-opt-in=org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi"
+    compilerOptions {
+        optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+        optIn.add("org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI")
     }
 }
 
