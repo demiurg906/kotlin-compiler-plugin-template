@@ -50,6 +50,7 @@ dependencies {
 tasks.test {
     dependsOn(project(":plugin-annotations").tasks.getByName("jar"))
     useJUnitPlatform()
+    workingDir = rootDir
     doFirst {
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
         setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib-jdk8", "kotlin-stdlib-jdk8")
@@ -70,6 +71,7 @@ tasks.withType<KotlinCompile>().configureEach {
 val generateTests by tasks.creating(JavaExec::class) {
     classpath = sourceSets.test.get().runtimeClasspath
     mainClass.set("org.demiurg906.kotlin.plugin.GenerateTestsKt")
+    workingDir = rootDir
 }
 
 val compileTestKotlin by tasks.getting {

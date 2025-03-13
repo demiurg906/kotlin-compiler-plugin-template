@@ -6,7 +6,7 @@ import org.demiurg906.kotlin.plugin.runners.AbstractDiagnosticTest
 
 fun main() {
     generateTestGroupSuiteWithJUnit5 {
-        testGroup(testDataRoot = "testData", testsRoot = "test-gen") {
+        testGroup(testDataRoot = "compiler-plugin/testData", testsRoot = "compiler-plugin/test-gen") {
             testClass<AbstractDiagnosticTest> {
                 model("diagnostics")
             }
