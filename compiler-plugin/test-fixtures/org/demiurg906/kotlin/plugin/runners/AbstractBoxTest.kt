@@ -30,32 +30,34 @@ open class AbstractBoxTest : BaseTestRunner(), RunnerWithTargetBackendForTestGen
     override val targetBackend: TargetBackend
         get() = TargetBackend.JVM_IR
 
-    override fun TestConfigurationBuilder.configuration() {
-        globalDefaults {
-            targetBackend = TargetBackend.JVM_IR
-            targetPlatform = JvmPlatforms.defaultJvmPlatform
-            dependencyKind = DependencyKind.Binary
-        }
+    override fun configure(builder: TestConfigurationBuilder) {
+        with(builder) {
+            globalDefaults {
+                targetBackend = TargetBackend.JVM_IR
+                targetPlatform = JvmPlatforms.defaultJvmPlatform
+                dependencyKind = DependencyKind.Binary
+            }
 
-        configureFirParser(FirParser.Psi)
+            configureFirParser(FirParser.Psi)
 
-        defaultDirectives {
-            +DUMP_IR
-        }
+            defaultDirectives {
+                +DUMP_IR
+            }
 
-        commonFirWithPluginFrontendConfiguration()
-        fir2IrStep()
-        irHandlersStep {
-            useHandlers(
-                ::IrTextDumpHandler,
-                ::IrTreeVerifierHandler,
-            )
-        }
-        facadeStep(::JvmIrBackendFacade)
-        jvmArtifactsHandlersStep {
-            useHandlers(::JvmBoxRunner)
-        }
+            commonFirWithPluginFrontendConfiguration()
+            fir2IrStep()
+            irHandlersStep {
+                useHandlers(
+                    ::IrTextDumpHandler,
+                    ::IrTreeVerifierHandler,
+                )
+            }
+            facadeStep(::JvmIrBackendFacade)
+            jvmArtifactsHandlersStep {
+                useHandlers(::JvmBoxRunner)
+            }
 
-        useAfterAnalysisCheckers(::BlackBoxCodegenSuppressor)
+            useAfterAnalysisCheckers(::BlackBoxCodegenSuppressor)
+        }
     }
 }

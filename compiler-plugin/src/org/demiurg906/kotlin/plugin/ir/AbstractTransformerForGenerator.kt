@@ -64,7 +64,6 @@ abstract class AbstractTransformerForGenerator(protected val context: IrPluginCo
             constructor.symbol,
             typeArgumentsCount = 0,
             constructorTypeArgumentsCount = 0,
-            valueArgumentsCount = 0
         )
         val returnStatement = IrReturnImpl(-1, -1, irBuiltIns.nothingType, function.symbol, constructorCall)
         return irFactory.createBlockBody(-1, -1, listOf(returnStatement))
@@ -79,7 +78,6 @@ abstract class AbstractTransformerForGenerator(protected val context: IrPluginCo
             irBuiltIns.anyType,
             irBuiltIns.anyClass.owner.primaryConstructor?.symbol ?: return null,
             typeArgumentsCount = 0,
-            valueArgumentsCount = 0
         )
 
         val initializerCall = IrInstanceInitializerCallImpl(
