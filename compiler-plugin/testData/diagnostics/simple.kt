@@ -1,6 +1,6 @@
 package foo.bar
 
-import org.itmo.my.pretty.plugin.SomeAnnotation
+import org.demiurg906.kotlin.plugin.SomeAnnotation
 
 @SomeAnnotation
 fun test() {

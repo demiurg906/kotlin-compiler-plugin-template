@@ -13,12 +13,16 @@ sourceSets {
     }
 }
 
+val annotationsRuntimeClasspath: Configuration by configurations.creating { isTransitive = false }
+
 dependencies {
     compileOnly(kotlin("compiler"))
 
     testImplementation(kotlin("test-junit5"))
     testImplementation(kotlin("compiler-internal-test-framework"))
     testImplementation(kotlin("compiler"))
+
+    annotationsRuntimeClasspath(project(":plugin-annotations"))
 
     // Dependencies required to run the internal test framework.
     testRuntimeOnly("junit:junit:4.13.2")
@@ -29,10 +33,12 @@ dependencies {
 }
 
 tasks.test {
-    dependsOn(project(":plugin-annotations").tasks.getByName("jar"))
+    dependsOn(annotationsRuntimeClasspath)
 
     useJUnitPlatform()
     workingDir = rootDir
+
+    systemProperty("annotationsRuntime.classpath", annotationsRuntimeClasspath.asPath)
 
     // Properties required to run the internal test framework.
     setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
