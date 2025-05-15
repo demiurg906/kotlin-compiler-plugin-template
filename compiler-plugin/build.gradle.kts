@@ -1,17 +1,5 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
-    java
-    kotlin("jvm") version "2.0.0"
-}
-group = "org.demiurg906.kotlin.plugin"
-version = "0.1"
-
-val kotlinVersion: String by project.properties
-
-repositories {
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    kotlin("jvm")
 }
 
 sourceSets {
@@ -26,49 +14,49 @@ sourceSets {
 }
 
 dependencies {
-    "org.jetbrains.kotlin:kotlin-compiler:$kotlinVersion".let {
-        compileOnly(it)
-        testImplementation(it)
-    }
+    compileOnly(kotlin("compiler"))
 
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-test:$kotlinVersion")
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-script-runtime:$kotlinVersion")
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-annotations-jvm:$kotlinVersion")
+    testImplementation(kotlin("test-junit5"))
+    testImplementation(kotlin("compiler-internal-test-framework"))
+    testImplementation(kotlin("compiler"))
 
-    testImplementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion")
-    testImplementation("org.jetbrains.kotlin:kotlin-compiler-internal-test-framework:$kotlinVersion")
-    testImplementation("junit:junit:4.13.2")
-
-    testImplementation(platform("org.junit:junit-bom:5.8.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation("org.junit.platform:junit-platform-commons")
-    testImplementation("org.junit.platform:junit-platform-launcher")
-    testImplementation("org.junit.platform:junit-platform-runner")
-    testImplementation("org.junit.platform:junit-platform-suite-api")
+    // Dependencies required to run the internal test framework.
+    testRuntimeOnly("junit:junit:4.13.2")
+    testRuntimeOnly(kotlin("reflect"))
+    testRuntimeOnly(kotlin("test"))
+    testRuntimeOnly(kotlin("script-runtime"))
+    testRuntimeOnly(kotlin("annotations-jvm"))
 }
 
 tasks.test {
     dependsOn(project(":plugin-annotations").tasks.getByName("jar"))
+
     useJUnitPlatform()
     workingDir = rootDir
-    doFirst {
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib-jdk8", "kotlin-stdlib-jdk8")
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-reflect", "kotlin-reflect")
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-test", "kotlin-test")
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-script-runtime", "kotlin-script-runtime")
-        setLibraryProperty("org.jetbrains.kotlin.test.kotlin-annotations-jvm", "kotlin-annotations-jvm")
-    }
+
+    // Properties required to run the internal test framework.
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib", "kotlin-stdlib")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-stdlib-jdk8", "kotlin-stdlib-jdk8")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-reflect", "kotlin-reflect")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-test", "kotlin-test")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-script-runtime", "kotlin-script-runtime")
+    setLibraryProperty("org.jetbrains.kotlin.test.kotlin-annotations-jvm", "kotlin-annotations-jvm")
 }
 
-tasks.withType<KotlinCompile>().configureEach {
+kotlin {
     compilerOptions {
         optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
         optIn.add("org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI")
     }
 }
 
-val generateTests by tasks.creating(JavaExec::class) {
+val generateTests by tasks.registering(JavaExec::class) {
+    inputs.dir(layout.projectDirectory.dir("testData"))
+        .withPropertyName("testData")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+    outputs.dir(layout.projectDirectory.dir("test-gen"))
+        .withPropertyName("generatedTests")
+
     classpath = sourceSets.test.get().runtimeClasspath
     mainClass.set("org.demiurg906.kotlin.plugin.GenerateTestsKt")
     workingDir = rootDir
@@ -76,7 +64,7 @@ val generateTests by tasks.creating(JavaExec::class) {
 
 val compileTestKotlin by tasks.getting {
     doLast {
-        generateTests.exec()
+        generateTests.get().exec()
     }
 }
 
