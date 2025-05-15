@@ -1,16 +1,5 @@
 plugins {
-    java
-    kotlin("jvm") version "2.0.0"
-}
-
-group = "ru.itmo.kotlin.plugin"
-version = "0.1"
-
-val kotlinVersion: String by project.properties
-
-repositories {
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+    kotlin("jvm")
 }
 
 sourceSets {

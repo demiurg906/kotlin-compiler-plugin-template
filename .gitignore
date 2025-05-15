@@ -1,4 +1,5 @@
 .idea/
 .gradle/
+.kotlin/
 build/
 out/
