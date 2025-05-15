@@ -17,4 +17,5 @@ dependencyResolutionManagement {
 rootProject.name = "kotlin-compiler-course-examples"
 
 include("compiler-plugin")
+include("gradle-plugin")
 include("plugin-annotations")
