@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm")
     `java-test-fixtures`
+    id("com.github.gmazzo.buildconfig")
 }
 
 sourceSets {
@@ -34,6 +35,15 @@ dependencies {
     testRuntimeOnly(kotlin("test"))
     testRuntimeOnly(kotlin("script-runtime"))
     testRuntimeOnly(kotlin("annotations-jvm"))
+}
+
+buildConfig {
+    useKotlinOutput {
+        internalVisibility = true
+    }
+
+    packageName(group.toString())
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${rootProject.group}\"")
 }
 
 tasks.test {
