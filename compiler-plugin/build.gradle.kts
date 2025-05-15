@@ -1,11 +1,15 @@
 plugins {
     kotlin("jvm")
+    `java-test-fixtures`
 }
 
 sourceSets {
     main {
         java.setSrcDirs(listOf("src"))
         resources.setSrcDirs(listOf("resources"))
+    }
+    testFixtures {
+        java.setSrcDirs(listOf("test-fixtures"))
     }
     test {
         java.setSrcDirs(listOf("test", "test-gen"))
@@ -18,9 +22,9 @@ val annotationsRuntimeClasspath: Configuration by configurations.creating { isTr
 dependencies {
     compileOnly(kotlin("compiler"))
 
-    testImplementation(kotlin("test-junit5"))
-    testImplementation(kotlin("compiler-internal-test-framework"))
-    testImplementation(kotlin("compiler"))
+    testFixturesApi(kotlin("test-junit5"))
+    testFixturesApi(kotlin("compiler-internal-test-framework"))
+    testFixturesApi(kotlin("compiler"))
 
     annotationsRuntimeClasspath(project(":plugin-annotations"))
 
@@ -63,15 +67,13 @@ val generateTests by tasks.registering(JavaExec::class) {
     outputs.dir(layout.projectDirectory.dir("test-gen"))
         .withPropertyName("generatedTests")
 
-    classpath = sourceSets.test.get().runtimeClasspath
+    classpath = sourceSets.testFixtures.get().runtimeClasspath
     mainClass.set("org.demiurg906.kotlin.plugin.GenerateTestsKt")
     workingDir = rootDir
 }
 
-val compileTestKotlin by tasks.getting {
-    doLast {
-        generateTests.get().exec()
-    }
+tasks.compileTestKotlin {
+    dependsOn(generateTests)
 }
 
 fun Test.setLibraryProperty(propName: String, jarName: String) {
