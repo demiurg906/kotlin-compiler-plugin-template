@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "kotlin-compiler-course-examples"
+rootProject.name = "kotlin-compiler-plugin-template"
 
 include("compiler-plugin")
 include("gradle-plugin")
