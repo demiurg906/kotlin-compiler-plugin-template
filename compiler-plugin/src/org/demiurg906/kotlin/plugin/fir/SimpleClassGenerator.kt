@@ -47,7 +47,7 @@ class SimpleClassGenerator(session: FirSession) : FirDeclarationGenerationExtens
         context: MemberGenerationContext?
     ): List<FirNamedFunctionSymbol> {
         val owner = context?.owner ?: return emptyList()
-        val function = createMemberFunction(owner, Key, callableId.callableName, returnType = session.builtinTypes.stringType.type)
+        val function = createMemberFunction(owner, Key, callableId.callableName, returnType = session.builtinTypes.stringType.coneType)
         return listOf(function.symbol)
     }
 
