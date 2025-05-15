@@ -1,4 +1,5 @@
-.idea/
+.idea/*
+!.idea/kotlinTestDataPluginTestDataPaths.xml
 .gradle/
 .kotlin/
 build/
