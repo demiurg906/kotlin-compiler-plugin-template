@@ -7,5 +7,5 @@ plugins {
 
 allprojects {
     group = "org.demiurg906.kotlin.plugin"
-    version = "0.1"
+    version = "0.1.0-SNAPSHOT"
 }
