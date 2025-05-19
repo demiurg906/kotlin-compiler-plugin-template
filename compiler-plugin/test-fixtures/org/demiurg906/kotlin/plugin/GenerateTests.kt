@@ -1,17 +1,17 @@
 package org.demiurg906.kotlin.plugin
 
 import org.jetbrains.kotlin.generators.generateTestGroupSuiteWithJUnit5
-import org.demiurg906.kotlin.plugin.runners.AbstractBoxTest
-import org.demiurg906.kotlin.plugin.runners.AbstractDiagnosticTest
+import org.demiurg906.kotlin.plugin.runners.AbstractJvmBoxTest
+import org.demiurg906.kotlin.plugin.runners.AbstractJvmDiagnosticTest
 
 fun main() {
     generateTestGroupSuiteWithJUnit5 {
         testGroup(testDataRoot = "compiler-plugin/testData", testsRoot = "compiler-plugin/test-gen") {
-            testClass<AbstractDiagnosticTest> {
+            testClass<AbstractJvmDiagnosticTest> {
                 model("diagnostics")
             }
 
-            testClass<AbstractBoxTest> {
+            testClass<AbstractJvmBoxTest> {
                 model("box")
             }
         }
