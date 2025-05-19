@@ -7,11 +7,11 @@ import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.CodegenTestDirectives
 import org.jetbrains.kotlin.test.directives.FirDiagnosticsDirectives
 import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives
-import org.jetbrains.kotlin.test.runners.codegen.AbstractFirBlackBoxCodegenTestBase
+import org.jetbrains.kotlin.test.runners.AbstractFirPhasedDiagnosticTest
 import org.jetbrains.kotlin.test.services.EnvironmentBasedStandardLibrariesPathProvider
 import org.jetbrains.kotlin.test.services.KotlinStandardLibrariesPathProvider
 
-open class AbstractBoxTest : AbstractFirBlackBoxCodegenTestBase(FirParser.LightTree) {
+open class AbstractJvmDiagnosticTest : AbstractFirPhasedDiagnosticTest(FirParser.LightTree) {
     override fun createKotlinStandardLibrariesPathProvider(): KotlinStandardLibrariesPathProvider {
         return EnvironmentBasedStandardLibrariesPathProvider
     }
@@ -26,13 +26,10 @@ open class AbstractBoxTest : AbstractFirBlackBoxCodegenTestBase(FirParser.LightT
              * - LanguageSettingsDirectives
              * - DiagnosticsDirectives
              * - FirDiagnosticsDirectives
-             * - CodegenTestDirectives
-             * - JvmEnvironmentConfigurationDirectives
              *
              * All of them are located in `org.jetbrains.kotlin.test.directives` package
              */
             defaultDirectives {
-                +CodegenTestDirectives.DUMP_IR
                 +FirDiagnosticsDirectives.FIR_DUMP
                 +JvmEnvironmentConfigurationDirectives.FULL_JDK
 
