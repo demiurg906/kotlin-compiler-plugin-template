@@ -1,3 +1,5 @@
+// RUN_PIPELINE_TILL: FRONTEND
+
 package foo.bar
 
 import org.demiurg906.kotlin.plugin.SomeAnnotation

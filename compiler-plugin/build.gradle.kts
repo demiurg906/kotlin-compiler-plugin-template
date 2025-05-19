@@ -61,6 +61,9 @@ tasks.test {
     setLibraryProperty("org.jetbrains.kotlin.test.kotlin-test", "kotlin-test")
     setLibraryProperty("org.jetbrains.kotlin.test.kotlin-script-runtime", "kotlin-script-runtime")
     setLibraryProperty("org.jetbrains.kotlin.test.kotlin-annotations-jvm", "kotlin-annotations-jvm")
+
+    systemProperty("idea.ignore.disabled.plugins", "true")
+    systemProperty("idea.home.path", rootDir)
 }
 
 kotlin {
